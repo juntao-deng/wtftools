@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         id="net.juniper.wtftools.builder.WtfProjectBuilder"
+         name="Wtf Project Builder"
+         point="org.eclipse.core.resources.builders">
+      <builder
+            hasNature="true">
+         <run
+               class="net.juniper.wtftools.builder.WtfProjectBuilder">
+         </run>
+      </builder>
+   </extension>
+   <extension
+         id="net.juniper.wtftools.builder.WtfProjectNature"
+         name="Wtf Project Nature"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="net.juniper.wtftools.builder.WtfProjectNature">
+         </run>
+      </runtime>
+      <builder
+            id="net.juniper.wtftools.builder.WtfProjectBuilder">
+      </builder>
+      <requires-nature
+            id="org.eclipse.jdt.core.javanature">
+      </requires-nature>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            name="Wtf Project Nature commands"
+            id="WtfTools.wtfprojectNature.category">
+      </category>
+      <command
+            name="Add/RemoveWtf Project Nature"
+            defaultHandler="net.juniper.wtftools.builder.AddRemoveWtfProjectNatureHandler"
+            categoryId="WtfTools.wtfprojectNature.category"
+            id="WtfTools.addRemoveWtfProjectNature">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="popup:org.eclipse.ui.projectConfigure?after=additions">
+         <command
+               commandId="WtfTools.addRemoveWtfProjectNature"
+               label="Disable Sample builder"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <and>
+                        <instanceof
+                              value="org.eclipse.core.resources.IProject">
+                        </instanceof>
+                        <test
+                              value="WtfTools.wtfprojectNature"
+                              property="org.eclipse.core.resources.projectNature">
+                        </test>
+                     </and>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="WtfTools.addRemoveWtfProjectNature"
+               label="Enable Sample builder"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <and>
+                        <instanceof
+                              value="org.eclipse.core.resources.IProject">
+                        </instanceof>
+                        <not>
+                           <test
+                                 value="WtfTools.wtfprojectNature"
+                                 property="org.eclipse.core.resources.projectNature">
+                           </test>
+                        </not>
+                     </and>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+   </extension>
+   <extension
+         id="xmlProblem"
+         name="XML Problem"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <persistent
+            value="true">
+      </persistent>
+   </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            name="Wtf Project Wizards"
+            id="WtfTools">
+      </category>
+      <wizard
+            category="WtfTools"
+            class="net.juniper.wtftools.wizards.WtfProjectNewWizard"
+            icon="icons/sample.gif"
+            id="net.juniper.wtftools.wizards.WtfProjectNewWizard"
+            name="Wtf Project Wizard"
+            project="true">
+      </wizard>
+      <wizard
+            category="WtfTools"
+            class="net.juniper.wtftools.wizards.WtfApplicationNewWizard"
+            icon="icons/sample.gif"
+            id="net.juniper.wtftools.wizards.WtfApplicationNewWizard"
+            name="Wtf Application Wizard"
+            project="false">
+      </wizard>
+      <wizard
+            category="WtfTools"
+            class="net.juniper.wtftools.wizards.WtfTemplateNewWizard"
+            icon="icons/sample.gif"
+            id="net.juniper.wtftools.wizards.WtfTemplateNewWizard"
+            name="Wtf Template Wizard"
+            project="false">
+      </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            name="Wtf Category"
+            id="WtfTools">
+      </category>
+      <view
+            name="Wtf View"
+            icon="icons/sample.gif"
+            category="WtfTools"
+            class="net.juniper.wtftools.views.WtfProjectView"
+            id="net.juniper.wtftools.views.WtfProjectView">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.eclipse.jdt.ui.JavaPerspective">
+         <view
+               ratio="0.5"
+               relative="org.eclipse.ui.views.ProblemView"
+               relationship="right"
+               id="net.juniper.wtftools.views.WtfProjectView">
+         </view>
+      </perspectiveExtension>
+   </extension>
+   <extension
+         point="org.eclipse.help.contexts">
+      <contexts
+            file="contexts.xml">
+      </contexts>
+   </extension>
+   <extension
+         point="org.eclipse.jdt.core.classpathContainerInitializer">
+      <classpathContainerInitializer
+            class="net.juniper.wtftools.project.WtfClasspathInitializer"
+            id="net.juniper.wtf.library.container">
+      </classpathContainerInitializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            adaptable="true"
+            objectClass="org.eclipse.core.resources.IResource"
+            id="net.juniper.wst-toolset">
+         <menu
+               label="Wtf Tools"
+               id="net.juniper.wst-tool">
+            <separator name="group0"/>
+         </menu>
+         <filter
+               value="net.juniper.wtftools.builder.WtfProjectNature"
+               name="projectNature"/>
+         <action
+               class="net.juniper.wtftools.project.UpdateWtfClasspathAction"
+               id="net.juniper.wtftools.project.UpdateWtfClasspathAction"
+               label="Update Wtf ClassPath"
+               menubarPath="net.juniper.wst-tool/group0"/>
+         <action
+               class="wtftools.Action1"
+               id="WtfTools.action1"
+               label="Add Wtf Project Nature">
+         </action>
+       	</objectContribution>
+    </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="net.juniper.wtftools.editor.BrowserDesignEditor"
+            default="false"
+            filenames="*.jspp"
+            id="net.juniper.wtftools.editor.BrowserDesignEditor"
+            name="Design Editor">
+      </editor>
+   </extension>
+</plugin>
