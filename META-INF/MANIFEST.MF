@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: WtfTools
-Bundle-SymbolicName: wtftoolsplugin;singleton:=true
+Bundle-Name: net.juniper.wtf.plugin
+Bundle-SymbolicName: net.juniper.wtf.plugin;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: net.juniper.wtftools.WtfToolsActivator
 Bundle-Vendor: Juniper Space UI Team
@@ -16,3 +16,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.e4.ui.model.workbench;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: lib/commons-io-1.3.2.jar,
+ lib/commons-lang3-3.1.jar,
+ .

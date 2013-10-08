@@ -201,8 +201,8 @@
                label="Update Wtf ClassPath"
                menubarPath="net.juniper.wst-tool/group0"/>
          <action
-               class="wtftools.Action1"
-               id="WtfTools.action1"
+               class="net.juniper.wtftools.project.AddWtfProjectNature"
+               id="net.juniper.wtftools.project.AddWtfProjectNature"
                label="Add Wtf Project Nature">
          </action>
        	</objectContribution>
@@ -212,7 +212,7 @@
       <editor
             class="net.juniper.wtftools.editor.BrowserDesignEditor"
             default="false"
-            filenames="*.jspp"
+            filenames="*.html"
             id="net.juniper.wtftools.editor.BrowserDesignEditor"
             name="Design Editor">
       </editor>
