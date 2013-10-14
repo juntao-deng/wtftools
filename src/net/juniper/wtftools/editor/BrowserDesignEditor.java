@@ -67,7 +67,6 @@ public class BrowserDesignEditor extends EditorPart {
 				if(text != null && text.startsWith("wtf_event:")){
 				}
 			}
-			
 		});
 	}
 
@@ -77,7 +76,7 @@ public class BrowserDesignEditor extends EditorPart {
 			String appDir = StringUtils.join(appPaths, "/", 0, appPaths.length - 1);
 			String designBasePath = getDesignBasePath();
 			String remoteUrl = "file:///" + designBasePath;
-			String replaceStr = APP_REPLACE.replace("#REPLACE#", "apps/" + appDir);
+			String replaceStr = APP_REPLACE.replace("#REPLACE#", appDir);
 			File template = new File(designBasePath + "design.html");
 			String templateStr = FileUtils.readFileToString(template);
 			String generatedPath = TEMP_WORK_DIR + appDir + "/design.html";
