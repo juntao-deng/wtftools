@@ -1,23 +1,41 @@
 package net.juniper.wtftools.core;
 
+import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import net.juniper.wtftools.WtfToolsActivator;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileInfo;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.filesystem.IFileSystem;
+import org.eclipse.core.filesystem.provider.FileInfo;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.internal.ui.packageview.PackageFragmentRootContainer;
+import org.eclipse.jdt.launching.JavaRuntime;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.ISelectionService;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.Workbench;
 
 public final class WtfProjectCommonTools {
@@ -71,9 +89,31 @@ public final class WtfProjectCommonTools {
 		return store.getString(LOCATION_KEY);
 	}
 	
+	private static Map<IProject, URLClassLoader> loaderMap = new HashMap<IProject, URLClassLoader>();
 	public static ClassLoader getCurrentProjectClassLoader() {
-		URL[] urls = null;
-		URLClassLoader loader = new URLClassLoader(urls, WtfProjectCommonTools.class.getClassLoader());
+		IProject project = getCurrentProject();
+		if(project == null)
+			return null;
+		URLClassLoader loader = loaderMap.get(project);
+		if(loader == null){
+			ArrayList<URL> allUrls = new ArrayList<URL>();
+			IJavaProject elementJavaProject = JavaCore.create(project);
+			if (elementJavaProject != null) {
+				try {
+					String[] classPathArray = JavaRuntime.computeDefaultRuntimeClassPath(elementJavaProject);
+					for (int i = 0; i < classPathArray.length; i++) {
+						File file = new File(classPathArray[i]);
+						System.out.println(classPathArray[i]);
+						allUrls.add(file.toURL());
+					}
+				} 
+				catch (Exception e) {
+					WtfToolsActivator.getDefault().logError(e);
+				}
+			}
+			loader = new URLClassLoader(allUrls.toArray(new URL[0]), WtfProjectCommonTools.class.getClassLoader());
+			loaderMap.put(project, loader);
+		}
 		return loader;
 	}
 
@@ -99,4 +139,47 @@ public final class WtfProjectCommonTools {
 		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 		return projects;
 	}
+	
+	/**
+	 * checkout files
+	 */
+	 public static void checkOutFile(String path){
+		IPath ph = new Path(path);
+		IFile ifile =  ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(ph);
+		File filea = new File(path);
+		//如果文件不可写，checkout,若果未连cc，变为可写
+		IWorkbenchPart part = null;
+		Shell shell = null;
+		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		if (page != null)
+			part = page.getActivePart();
+		if(part != null)
+			shell = part.getSite().getShell();
+		IStatus statu = ResourcesPlugin.getWorkspace().validateEdit(new IFile[]{ifile}, shell);
+		if(!filea.canWrite() && !statu.isOK()){
+			boolean isWritable = MessageDialog.openConfirm(null, "Warning", "Make file writable?");
+			if(isWritable){
+				try {
+					silentSetWriterable(path);
+				} 
+				catch (Exception e) {
+					WtfToolsActivator.getDefault().logError(e.getMessage());
+					MessageDialog.openInformation(null, "Warning", e.getMessage());
+				}
+			}
+		}
+	 }
+	 
+	/**
+	 * Make file writable
+	 * @param filename
+	 * @throws CoreException
+	 */
+	public static void silentSetWriterable(String filename) throws CoreException {
+	     IFileInfo fileinfo = new FileInfo(filename);
+	     fileinfo.setAttribute(EFS.ATTRIBUTE_READ_ONLY, false);
+	     IFileSystem fs = EFS.getLocalFileSystem();
+	     IFileStore store = fs.fromLocalFile(new File(filename));
+	     store.putInfo(fileinfo, EFS.SET_ATTRIBUTES, null);
+	 }
 }
