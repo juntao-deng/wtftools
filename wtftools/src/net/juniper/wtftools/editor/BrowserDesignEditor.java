@@ -2,12 +2,15 @@ package net.juniper.wtftools.editor;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 import net.juniper.wtftools.WtfToolsActivator;
 import net.juniper.wtftools.core.WtfProjectCommonTools;
+import net.juniper.wtftools.designer.BrowserEventHandlerFactory;
+import net.sf.json.JSONObject;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.SWT;
@@ -23,9 +26,10 @@ import org.eclipse.ui.part.FileEditorInput;
 
 public class BrowserDesignEditor extends EditorPart {
 
-	private static final String TEMP_WORK_DIR = "c:/wtf_design_temp/";
+	private static final String WTF_EVENT = "wtf_event:";
+	private static final String TEMP_WORK_DIR = System.getProperty("user.dir");
 	private static final String APP_REPLACE = "<div wtftype=\"application\" wtfmetadata=\"#REPLACE#\"/>";
-
+	private Browser browser;
 	@Override
 	public void doSave(IProgressMonitor monitor) {
 
@@ -41,6 +45,7 @@ public class BrowserDesignEditor extends EditorPart {
 			throws PartInitException {
 		this.setSite(site);
 		this.setInput(input);
+		WtfProjectCommonTools.setCurrentProject(((FileEditorInput)input).getPath());
 	}
 
 	@Override
@@ -55,7 +60,7 @@ public class BrowserDesignEditor extends EditorPart {
 
 	@Override
 	public void createPartControl(Composite parent) {
-		final Browser browser = new Browser(parent, SWT.WEBKIT);
+		browser = new Browser(parent, SWT.WEBKIT);
 		browser.setJavascriptEnabled(true);
 		String url = getUrl();
 		WtfToolsActivator.getDefault().logInfo("open url:" + url);
@@ -64,10 +69,20 @@ public class BrowserDesignEditor extends EditorPart {
 			@Override
 			public void changed(StatusTextEvent event) {
 				String text = event.text;
-				if(text != null && text.startsWith("wtf_event:")){
+				if(text != null && text.startsWith(WTF_EVENT)){
+					responseToRequest(text);
 				}
 			}
+
 		});
+	}
+	private void responseToRequest(String text) {
+		String jsonStr = text.substring(WTF_EVENT.length());
+		Map obj = BrowserEventHandlerFactory.handleEvent(jsonStr);
+		if(obj != null){
+			String result = JSONObject.fromObject(obj).toString();
+			browser.execute("design_callback('" + result + "')");
+		}
 	}
 
 	private String getUrl() {
@@ -93,7 +108,7 @@ public class BrowserDesignEditor extends EditorPart {
 	}
 
 	private String getDesignBasePath() {
-		return "D:/devspace/workspace/workspace_wtf/com.juniper.jnrd.wtftools/web/src/main/webapp/designsupport/";
+		return WtfProjectCommonTools.getFrameworkLocation() + "/src/main/webapp/designsupport/";
 	}
 
 	private String[] getAppPath() {
@@ -119,4 +134,8 @@ public class BrowserDesignEditor extends EditorPart {
 
 	}
 
+	public static void main(String[] args){
+		String text = WTF_EVENT + "{name:'1', text:2, c:{a:1,b:2}}";
+		new BrowserDesignEditor().responseToRequest(text);
+	}
 }

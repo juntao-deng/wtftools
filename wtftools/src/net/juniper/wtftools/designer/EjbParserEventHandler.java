@@ -1,37 +1,38 @@
 package net.juniper.wtftools.designer;
 
-import java.util.List;
-import java.util.Map;
-
 import net.juniper.wtftools.WtfToolsActivator;
+import net.juniper.wtftools.core.WtfProjectCommonTools;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
-public class EjbParserEventHandler implements IBrowserEventHandler{
+public class EjbParserEventHandler extends AbstractBrowserEventHandler{
 
 	private static final String CLASSNAME = "classname";
 	private static final String ENTITY = "entity";
 
+	private JSONArray getColumnInfos(Class c) {
+		return null;
+	}
+
 	@Override
-	public boolean canHanle(Map<String, Object> json) {
-		if(json.get(ACTION).equals(ENTITY)){
-			try{
-				String className = (String) json.get(CLASSNAME);
-				WtfToolsActivator.getDefault().logInfo("=== parsing class:" + className);
-				Class c = Class.forName(className);
-				List<Map<String, String>> columnInfos = getColumnInfos(c);
-			}
-			catch(Exception e){
-				WtfToolsActivator.getDefault().logError(e);
-			}
+	public JSONObject handle(JSONObject json) {
+		try{
+			String className = (String) json.get(CLASSNAME);
+			WtfToolsActivator.getDefault().logInfo("=== parsing class:" + className);
+			Class c = Class.forName(className, true, WtfProjectCommonTools.getCurrentProjectClassLoader());
+			JSONObject result = new JSONObject();
+			JSONArray columnInfos = getColumnInfos(c);
+			result.put("columns", columnInfos);
+			return result;
 		}
-		return false;
-	}
-
-	private List<Map<String, String>> getColumnInfos(Class c) {
-		return null;
+		catch(Exception e){
+			WtfToolsActivator.getDefault().logError(e);
+			return dumpError(e.getMessage());
+		}
 	}
 
 	@Override
-	public Map<String, Object> handle(Map<String, Object> json) {
-		return null;
+	protected String getActionName() {
+		return ENTITY;
 	}
 }

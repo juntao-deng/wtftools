@@ -131,7 +131,7 @@
             icon="icons/sample.gif"
             id="net.juniper.wtftools.wizards.WtfApplicationNewWizard"
             name="Wtf Application Wizard"
-            project="false">
+            project="true">
       </wizard>
       <wizard
             category="WtfTools"
@@ -216,5 +216,19 @@
             id="net.juniper.wtftools.editor.BrowserDesignEditor"
             name="Design Editor">
       </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="net.juniper.wtftools.preferences.WtfPreferencePagesCategory"
+            id="net.juniper.wtftools.preferences.WtfPreferencePagesCategory"
+            name="Wtf Configurations">
+      </page>
+      <page
+            category="net.juniper.wtftools.preferences.WtfPreferencePagesCategory"
+            class="net.juniper.wtftools.preferences.WtfPreferencePagesLocation"
+            id="net.juniper.wtftools.preferences.WtfPreferencePagesLocation"
+            name="Framework Project Location">
+      </page>
    </extension>
 </plugin>
