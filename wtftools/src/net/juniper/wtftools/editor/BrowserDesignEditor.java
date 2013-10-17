@@ -30,6 +30,9 @@ public class BrowserDesignEditor extends EditorPart {
 	private static final String TEMP_WORK_DIR = System.getProperty("user.dir");
 	private static final String APP_REPLACE = "<div wtftype=\"application\" wtfmetadata=\"#REPLACE#\"/>";
 	private Browser browser;
+	private IPath appPath;
+	private IPath restPath;
+	private IPath htmlPath;
 	@Override
 	public void doSave(IProgressMonitor monitor) {
 
@@ -45,7 +48,9 @@ public class BrowserDesignEditor extends EditorPart {
 			throws PartInitException {
 		this.setSite(site);
 		this.setInput(input);
-		WtfProjectCommonTools.setCurrentProject(((FileEditorInput)input).getPath());
+		htmlPath = ((FileEditorInput)input).getPath();
+		appPath = htmlPath.removeLastSegments(1);
+		WtfProjectCommonTools.setCurrentProject(htmlPath);
 	}
 
 	@Override
@@ -60,7 +65,7 @@ public class BrowserDesignEditor extends EditorPart {
 
 	@Override
 	public void createPartControl(Composite parent) {
-		browser = new Browser(parent, SWT.WEBKIT);
+		browser = new Browser(parent, SWT.NONE);
 		browser.setJavascriptEnabled(true);
 		String url = getUrl();
 		WtfToolsActivator.getDefault().logInfo("open url:" + url);
