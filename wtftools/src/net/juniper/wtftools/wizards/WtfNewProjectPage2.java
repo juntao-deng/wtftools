@@ -123,9 +123,9 @@ public class WtfNewProjectPage2 extends WizardPage implements  IPropertyChangeLi
 		final Composite composite = new Composite(parent, SWT.NULL);
 		composite.setLayout(initGridLayout(new GridLayout(2, false), true));
 		
-		contextPath = createStringDialogField("·ÃÎÊÆ÷Â·¾¶", composite);
+		contextPath = createStringDialogField("Context Path", composite);
 		
-		//isPortalProject = createCheckBoxField("ÊÇ·ñPortal¹¤³Ì", composite);
+		//isPortalProject = createCheckBoxField("æ˜¯å¦Portalå·¥ç¨‹", composite);
 		
 		setControl(composite);
 		fInited = true;
@@ -158,14 +158,14 @@ public class WtfNewProjectPage2 extends WizardPage implements  IPropertyChangeLi
 		if(contextPath != null){
 			setContext(contextPath.getText());
 			if(getContext().equals("")){
-				//setErrorMessage("Context²»ÄÜÎª¿Õ");
+				//setErrorMessage("Contextä¸èƒ½ä¸ºç©º");
 				setPageComplete(false);
 				//return false;
 			}
 			Pattern pattern = Pattern.compile("[!@~#$%^&*-+]+");//just test
 			if(pattern.matcher(getContext().trim()).find())
 			{
-				//setErrorMessage("ContextÖĞÇë²»Òª°üº¬: ! @ ~ # $ % ^ & * - + µÈÌØÊâ·ûºÅ!");
+				//setErrorMessage("Contextä¸­è¯·ä¸è¦åŒ…å«: ! @ ~ # $ % ^ & * - + ç­‰ç‰¹æ®Šç¬¦å·!");
 				setPageComplete(false);
 				//return false;
 			}
@@ -179,15 +179,11 @@ public class WtfNewProjectPage2 extends WizardPage implements  IPropertyChangeLi
 		if(contextPath != null && contextPath.getText() != null){
 			setContext(contextPath.getText());
 			if(getContext().equals("")){
-				//setErrorMessage("Context²»ÄÜÎª¿Õ");
-				//setPageComplete(false);
 				return false;
 			}
 			Pattern pattern = Pattern.compile("[!@~#$%^&*-+]+");//just test
 			if(pattern.matcher(getContext().trim()).find())
 			{
-				//setErrorMessage("ContextÖĞÇë²»Òª°üº¬: ! @ ~ # $ % ^ & * - + µÈÌØÊâ·ûºÅ!");
-				//setPageComplete(false);
 				return false;
 			}
 			

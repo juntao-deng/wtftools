@@ -375,13 +375,13 @@ public class ProjCoreUtility {
 //		
 ////		IFolder toFolder = project.getFolder(targetFolder);
 ////		if(toFolder.exists()){
-////			if (!MessageDialog.openQuestion(JavaPlugin.getActiveWorkbenchShell(), "ĞÅÏ¢", "Lfw webÎÄ¼ş¼ĞÒÑ¾­´æÔÚ£¡¸²¸Ç£¿"))
+////			if (!MessageDialog.openQuestion(JavaPlugin.getActiveWorkbenchShell(), "ä¿¡æ¯", "Lfw webæ–‡ä»¶å¤¹å·²ç»å­˜åœ¨ï¼è¦†ç›–ï¼Ÿ"))
 ////				return false;
 ////		}
 //		try{
-//			//Á½ÖÖÍ¾¾¶¿½±´ lfw¹¤³ÌËùĞèµÄÎÄ¼ş
+//			//ä¸¤ç§é€”å¾„æ‹·è´ lfwå·¥ç¨‹æ‰€éœ€çš„æ–‡ä»¶
 //			String sourcePath = getWebSourcePath();
-//			//¿½±´Ö¸¶¨ÎÄ¼ş
+//			//æ‹·è´æŒ‡å®šæ–‡ä»¶
 //			String[] copyPaths = WEBCopyPathConstants.getWebCopyPath();
 //			String fromPath = null;
 //			String toPath = null;
@@ -391,9 +391,9 @@ public class ProjCoreUtility {
 //				FileUtilities.copyFile(fromPath, toPath);
 //			}
 //			
-//			//¿½±´webbaseÏÂcopynodesµÄËùÓĞÎÄ¼ş¼Ğ¼°ÎÄ¼ş
+//			//æ‹·è´webbaseä¸‹copynodesçš„æ‰€æœ‰æ–‡ä»¶å¤¹åŠæ–‡ä»¶
 //			///**
-////			 * ¸´ÖÆÄ¿Â¼ÏÂµÄÎÄ¼ş£¨²»°üÀ¨´ËÄ¿Â¼£©µ½Ö¸¶¨Ä¿Â¼£¬Á¬Í¬×ÓÄ¿Â¼Ò»Æğ¸´ÖÆ¡£
+////			 * å¤åˆ¶ç›®å½•ä¸‹çš„æ–‡ä»¶ï¼ˆä¸åŒ…æ‹¬æ­¤ç›®å½•ï¼‰åˆ°æŒ‡å®šç›®å½•ï¼Œè¿åŒå­ç›®å½•ä¸€èµ·å¤åˆ¶ã€‚
 ////			 * @param toPath
 ////			 * @param fromPath
 ////			 */
@@ -401,7 +401,7 @@ public class ProjCoreUtility {
 //			String copyfiles =  sourcePath + "/" + "copynodes";
 //			FileUtilities.copyFileFromDir(toDir, copyfiles);
 //
-//			//Ìæ»»web.xmlÎÄ¼şÖĞÄÚÈİ
+//			//æ›¿æ¢web.xmlæ–‡ä»¶ä¸­å†…å®¹
 //			String webtoPath = project.getLocation().toString() + "/" + targetFolder + "/WEB-INF";
 //			String filePath = webtoPath + "/web.xml";
 //			String fileContent = FileUtilities.fetchFileContent(filePath);
@@ -414,7 +414,7 @@ public class ProjCoreUtility {
 //			
 //		}
 //		catch(Exception e){
-//			WEBProjPlugin.getDefault().logError("¿½±´LFWÎÄ¼ş³ö´í£º" + e.getMessage(), e);
+//			WEBProjPlugin.getDefault().logError("æ‹·è´LFWæ–‡ä»¶å‡ºé”™ï¼š" + e.getMessage(), e);
 //			return false;
 //		}
 //		return true;
@@ -423,7 +423,7 @@ public class ProjCoreUtility {
 //	
 //	
 //	/**
-// 	 * web.xmlÂ·¾¶
+// 	 * web.xmlè·¯å¾„
 // 	 * @return
 // 	 * @throws Exception
 // 	 */
@@ -440,7 +440,7 @@ public class ProjCoreUtility {
 ////        try {
 ////            return dbf.newDocumentBuilder();
 ////        } catch (ParserConfigurationException e) {
-////            throw new RuntimeException("XML½âÎöÆ÷¹¹ÔìÊ§°Ü!");
+////            throw new RuntimeException("XMLè§£æå™¨æ„é€ å¤±è´¥!");
 ////        }
 ////    }
 //
@@ -542,13 +542,13 @@ public class ProjCoreUtility {
 ////		{
 ////			if (!project.hasNature(CommonConstants.MODULE_NATURE))
 ////			{
-////				throw new IllegalArgumentException("ÎŞĞ§µÄ²ÎÊı,²»ÊÇLFWProject");
+////				throw new IllegalArgumentException("æ— æ•ˆçš„å‚æ•°,ä¸æ˜¯LFWProject");
 ////			}
 ////			
 ////		}
 ////		catch (CoreException e)
 ////		{
-////			throw new IllegalArgumentException("ÎŞĞ§µÄ²ÎÊı,²»ÊÇMDEProject");
+////			throw new IllegalArgumentException("æ— æ•ˆçš„å‚æ•°,ä¸æ˜¯MDEProject");
 ////		}
 ////		return new WEBProject(project);
 ////	}

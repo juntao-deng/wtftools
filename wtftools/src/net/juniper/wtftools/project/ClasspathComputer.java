@@ -144,7 +144,7 @@ public class ClasspathComputer{
 	}
 	
 	/**
-	 * 获得RSD jar文件列表
+	 * 閿熸枻鎷烽敓绲塖D jar閿熶茎纭锋嫹閿熷彨鎲嬫嫹
 	 * @param folders
 	 * @return
 	 * @throws CoreException
@@ -163,7 +163,7 @@ public class ClasspathComputer{
 	}
 //	
 //	/**
-//	 * 获得第三方 jar文件列表
+//	 * 閿熸枻鎷风帿閿熸枻鎷烽敓锟絡ar閿熶茎纭锋嫹閿熷彨鎲嬫嫹
 //	 * @param folders
 //	 * @return
 //	 * @throws CoreException
