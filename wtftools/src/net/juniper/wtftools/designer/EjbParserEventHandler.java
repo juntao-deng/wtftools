@@ -16,9 +16,11 @@ import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
+import org.eclipse.jdt.internal.core.PackageFragment;
 import org.eclipse.jdt.internal.ui.JavaUIMessages;
 import org.eclipse.jdt.internal.ui.dialogs.OpenTypeSelectionDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.SelectionDialog;
@@ -31,7 +33,7 @@ public class EjbParserEventHandler extends AbstractBrowserEventHandler{
 	private JSONArray getColumnInfos(Class c) throws EventHandlerException{
 		Entity entity = (Entity) c.getAnnotation(Entity.class);
 		if(entity == null)
-			throw new EventHandlerException("The selected class is not an entity");
+			throw new RuntimeException("The selected class is not an entity");
 		JSONArray arr = new JSONArray();
 		
 		String[] props = null;
@@ -93,16 +95,24 @@ public class EjbParserEventHandler extends AbstractBrowserEventHandler{
 	public JSONObject handle(BrowserDesignEditor editor, JSONObject json) {
 		try{
 			String className = getClassName();
+			if(className == null){
+				return null;
+			}
 			WtfToolsActivator.getDefault().logInfo("=== parsing class:" + className);
 			Class c = Class.forName(className, true, WtfProjectCommonTools.getCurrentProjectClassLoader());
 			JSONObject result = new JSONObject();
 			JSONArray columnInfos = getColumnInfos(c);
-			result.put("columns", columnInfos);
+			result.put("columns", columnInfos); 
 			return result;
 		}
-		catch(Exception e){
+		catch(EventHandlerException e){
 			WtfToolsActivator.getDefault().logError(e);
 			return dumpError(e.getMessage());
+		} 
+		catch (Exception e) {
+			WtfToolsActivator.getDefault().logError(e);
+			MessageDialog.openError(Display.getCurrent().getActiveShell(), "ERROR", e.getMessage());
+			return null;
 		}
 	}
 
@@ -120,7 +130,8 @@ public class EjbParserEventHandler extends AbstractBrowserEventHandler{
 			return null;
 
 		if (types.length == 1) {
-			return ((IJavaElement)types[0]).getElementName();
+			String pack = ((PackageFragment)((IJavaElement)types[0]).getParent().getParent()).getElementName();
+			return pack + "." + ((IJavaElement)types[0]).getElementName();
 		}
 		return null;
 	}

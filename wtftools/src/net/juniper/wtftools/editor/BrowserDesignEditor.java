@@ -108,7 +108,7 @@ public class BrowserDesignEditor extends EditorPart {
 		Map obj = BrowserEventHandlerFactory.handleEvent(editor, jsonStr);
 		if(obj != null){
 			String result = JSONObject.fromObject(obj).toString();
-			browser.execute("design_callback('" + result + "')");
+			browser.execute("FwBase.Wtf.Design.DesignSupport.fireInput('" + result + "')");
 		}
 	}
 
