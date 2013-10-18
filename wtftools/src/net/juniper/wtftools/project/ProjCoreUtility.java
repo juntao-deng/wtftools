@@ -80,15 +80,16 @@ public class ProjCoreUtility {
 	public static IClasspathEntry[] getClasspathEntry(IProject project, WtfProjectClassPathContainerID id) throws CoreException
 	{
 		//WEBProject mdeproject = ProjCoreUtility.createMDEProject(project);
-		IPath path = WtfProjectCommonTools.getJbossHome();
-		switch (id){
-			case JBoss_Library:
-				return computeClasspathEntry(ClasspathComputer.computeJbossJarsInPath(path), Accessible);
-			case ThdParty_Library:
-				return computeClasspathEntry(ClasspathComputer.compute3rdPartyJarsInPath(path), Accessible);
-			default:
-				return new IClasspathEntry[0];
-		}
+//		IPath path = WtfProjectCommonTools.getJbossHome();
+//		switch (id){
+//			case JBoss_Library:
+//				return computeClasspathEntry(ClasspathComputer.computeJbossJarsInPath(path), Accessible);
+//			case ThdParty_Library:
+//				return computeClasspathEntry(ClasspathComputer.compute3rdPartyJarsInPath(path), Accessible);
+//			default:
+//				return new IClasspathEntry[0];
+//		}
+		return new IClasspathEntry[0];
 	}
 
 	public static IClasspathEntry[] computeClasspathEntry(LibraryLocation[] accessiblelibs, LibraryLocation[] discouragedlibs, LibraryLocation[] fobiddenlibs)

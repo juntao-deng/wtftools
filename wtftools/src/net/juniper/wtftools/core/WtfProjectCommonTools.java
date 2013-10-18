@@ -38,13 +38,19 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.Workbench;
 
+import com.sysdeo.eclipse.tomcat.TomcatLauncherPlugin;
+
 public final class WtfProjectCommonTools {
 	public static final String LOCATION_KEY = "framework_location_key";
 	private static IProject currProject;
-	public static IPath getJbossHome(){
-		String jbossHome = System.getenv("JBOSS_HOME");
-		WtfToolsActivator.getDefault().logInfo("get jboss home path:" + jbossHome);
-		return Path.fromOSString(jbossHome);
+//	public static IPath getJbossHome(){
+//		String jbossHome = System.getenv("JBOSS_HOME");
+//		WtfToolsActivator.getDefault().logInfo("get jboss home path:" + jbossHome);
+//		return Path.fromOSString(jbossHome);
+//	}
+	
+	public static String getTomcatHome() {
+		return TomcatLauncherPlugin.getDefault().getTomcatDir();
 	}
 	
 	public static IProject getCurrentProject() {

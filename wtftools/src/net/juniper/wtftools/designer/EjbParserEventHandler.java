@@ -9,6 +9,7 @@ import javax.xml.bind.annotation.XmlType;
 
 import net.juniper.wtftools.WtfToolsActivator;
 import net.juniper.wtftools.core.WtfProjectCommonTools;
+import net.juniper.wtftools.editor.BrowserDesignEditor;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -89,7 +90,7 @@ public class EjbParserEventHandler extends AbstractBrowserEventHandler{
 	}
 
 	@Override
-	public JSONObject handle(JSONObject json) {
+	public JSONObject handle(BrowserDesignEditor editor, JSONObject json) {
 		try{
 			String className = getClassName();
 			WtfToolsActivator.getDefault().logInfo("=== parsing class:" + className);

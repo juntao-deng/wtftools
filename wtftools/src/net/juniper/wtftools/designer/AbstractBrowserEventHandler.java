@@ -4,6 +4,7 @@ import net.sf.json.JSONObject;
 
 
 public abstract class AbstractBrowserEventHandler implements IBrowserEventHandler {
+
 	protected JSONObject dumpError(String error){
 		JSONObject obj = new JSONObject();
 		obj.put("errormsg", error);

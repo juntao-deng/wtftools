@@ -2,6 +2,7 @@ package net.juniper.wtftools.editor;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import net.juniper.wtftools.WtfToolsActivator;
@@ -19,6 +20,7 @@ import org.eclipse.swt.browser.StatusTextEvent;
 import org.eclipse.swt.browser.StatusTextListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
@@ -33,14 +35,28 @@ public class BrowserDesignEditor extends EditorPart {
 	private IPath appPath;
 	private IPath restPath;
 	private IPath htmlPath;
+	private boolean dirty = false;
+	private Map<String, String> modelMap = new HashMap<String, String>();
+	private Map<String, String> controllerMap = new HashMap<String, String>();
+	private Map<String, JSONObject> restMap = new HashMap<String, JSONObject>();
+	private String htmlContent;
+	
+	public void setDirty(boolean dirty){
+		this.dirty = dirty;
+		this.firePropertyChange(IEditorPart.PROP_DIRTY);
+	}
+	
 	@Override
 	public void doSave(IProgressMonitor monitor) {
-
+		ApplicationUpdateHelper.update(appPath, restPath, htmlPath, modelMap, controllerMap, htmlContent);
+		modelMap.clear();
+		controllerMap.clear();
+		htmlContent = null;
+		setDirty(false);
 	}
 
 	@Override
 	public void doSaveAs() {
-
 	}
 
 	@Override
@@ -51,11 +67,16 @@ public class BrowserDesignEditor extends EditorPart {
 		htmlPath = ((FileEditorInput)input).getPath();
 		appPath = htmlPath.removeLastSegments(1);
 		WtfProjectCommonTools.setCurrentProject(htmlPath);
+		IPath restPath = htmlPath.removeLastSegments(1);
+		while(!restPath.lastSegment().equals("applications")){
+			restPath = restPath.removeLastSegments(1);
+		}
+		restPath = restPath.removeLastSegments(1).append("rest");
 	}
 
 	@Override
 	public boolean isDirty() {
-		return false;
+		return dirty ;
 	}
 
 	@Override
@@ -70,20 +91,21 @@ public class BrowserDesignEditor extends EditorPart {
 		String url = getUrl();
 		WtfToolsActivator.getDefault().logInfo("open url:" + url);
 		browser.setUrl(url);
+		final BrowserDesignEditor editor = this;
 		browser.addStatusTextListener(new StatusTextListener(){
 			@Override
 			public void changed(StatusTextEvent event) {
 				String text = event.text;
 				if(text != null && text.startsWith(WTF_EVENT)){
-					responseToRequest(text);
+					responseToRequest(editor, text);
 				}
 			}
 
 		});
 	}
-	private void responseToRequest(String text) {
+	private void responseToRequest(BrowserDesignEditor editor, String text) {
 		String jsonStr = text.substring(WTF_EVENT.length());
-		Map obj = BrowserEventHandlerFactory.handleEvent(jsonStr);
+		Map obj = BrowserEventHandlerFactory.handleEvent(editor, jsonStr);
 		if(obj != null){
 			String result = JSONObject.fromObject(obj).toString();
 			browser.execute("design_callback('" + result + "')");
@@ -139,8 +161,19 @@ public class BrowserDesignEditor extends EditorPart {
 
 	}
 
-	public static void main(String[] args){
-		String text = WTF_EVENT + "{name:'1', text:2, c:{a:1,b:2}}";
-		new BrowserDesignEditor().responseToRequest(text);
+	public void setHtmlContent(String html) {
+		this.htmlContent = html;
+	}
+
+	public void addModel(String key, String metadata) {
+		this.modelMap.put(key, metadata);
+	}
+
+	public void addController(String key, String controller) {
+		this.controllerMap.put(key, controller);
+	}
+	
+	public void addRest(String file, JSONObject api){
+		this.restMap.put(file, api);
 	}
 }
