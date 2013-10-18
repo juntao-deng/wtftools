@@ -1,6 +1,7 @@
 package net.juniper.wtftools.project;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import net.juniper.wtftools.WtfToolsActivator;
 import net.juniper.wtftools.core.WtfProjectCommonTools;
@@ -24,15 +25,12 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IAccessRule;
 import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathEntry;
-import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.JavaModelException;
 
 public class ProjCoreUtility {
 	public static IAccessRule[]	Fobidden	= new IAccessRule[] { JavaCore.newAccessRule(new Path("**/*"), IAccessRule.K_NON_ACCESSIBLE) };
 	public static IAccessRule[]	Discouraged	= new IAccessRule[] { JavaCore.newAccessRule(new Path("**/*"), IAccessRule.K_DISCOURAGED) };
 	public static IAccessRule[]	Accessible	= {};
-//	private static final String targetFolder = "web";
 
 	public static void createProject(IProject project, IPath location, IProgressMonitor monitor) throws CoreException
 	{
@@ -49,10 +47,6 @@ public class ProjCoreUtility {
 	public static void addNatureToProject(IProject proj, String[] natureIds, IProgressMonitor monitor) throws CoreException
 	{
 		IProjectDescription description = proj.getDescription();
-//		String[] prevNatures = description.getNatureIds();
-//		String[] newNatures = new String[prevNatures.length + 1];
-//		System.arraycopy(prevNatures, 0, newNatures, 0, prevNatures.length);
-//		newNatures[prevNatures.length] = natureId;
 		description.setNatureIds(natureIds);
 		proj.setDescription(description, monitor);
 	}
@@ -79,30 +73,49 @@ public class ProjCoreUtility {
 //
 	public static IClasspathEntry[] getClasspathEntry(IProject project, WtfProjectClassPathContainerID id) throws CoreException
 	{
-		//WEBProject mdeproject = ProjCoreUtility.createMDEProject(project);
-//		IPath path = WtfProjectCommonTools.getJbossHome();
-//		switch (id){
-//			case JBoss_Library:
-//				return computeClasspathEntry(ClasspathComputer.computeJbossJarsInPath(path), Accessible);
-//			case ThdParty_Library:
-//				return computeClasspathEntry(ClasspathComputer.compute3rdPartyJarsInPath(path), Accessible);
-//			default:
-//				return new IClasspathEntry[0];
-//		}
+		if(WtfProjectCommonTools.isTomcat()){
+			if(WtfProjectCommonTools.getTomcatHome().equals("")){
+				WtfToolsActivator.getDefault().logError("Please config tomcat's path first");
+				return new IClasspathEntry[0];
+			}
+			IPath path = Path.fromOSString(WtfProjectCommonTools.getTomcatHome());
+			switch (id){
+				case Middleware_Library:
+					return computeMiddlewareJarsInPath();
+				case ThdParty_Library:
+					return computeClasspathEntry(ClasspathComputer.compute3rdPartyJarsInPath(path), Accessible);
+				default:
+					return new IClasspathEntry[0];
+			}
+		}
 		return new IClasspathEntry[0];
 	}
 
-	public static IClasspathEntry[] computeClasspathEntry(LibraryLocation[] accessiblelibs, LibraryLocation[] discouragedlibs, LibraryLocation[] fobiddenlibs)
-	throws CoreException {
-		IClasspathEntry[] accessibleEntries = computeClasspathEntry(accessiblelibs, Accessible);
-		IClasspathEntry[] discouragedEntries = computeClasspathEntry(discouragedlibs, Discouraged);
-		IClasspathEntry[] fobiddenEntries = computeClasspathEntry(fobiddenlibs, Fobidden);
-		IClasspathEntry[] allentries = new IClasspathEntry[accessibleEntries.length + discouragedEntries.length + fobiddenEntries.length];
-		System.arraycopy(accessibleEntries, 0, allentries, 0, accessibleEntries.length);
-		System.arraycopy(discouragedEntries, 0, allentries, accessibleEntries.length, discouragedEntries.length);
-		System.arraycopy(fobiddenEntries, 0, allentries, accessibleEntries.length + discouragedEntries.length, fobiddenEntries.length);
-		return allentries;
+	private static IClasspathEntry[] computeMiddlewareJarsInPath() {
+		List<IClasspathEntry> list = new ArrayList<IClasspathEntry>();
+		if(WtfProjectCommonTools.isTomcat()){
+			String tomcat = WtfProjectCommonTools.getTomcatHome();
+			list.add(JavaCore.newLibraryEntry(new Path(tomcat + "/lib/servlet-api.jar"), null, null, null, null, false));
+			list.add(JavaCore.newLibraryEntry(new Path(tomcat + "/lib/jasper.jar"), null, null, null, null, false));
+			list.add(JavaCore.newLibraryEntry(new Path(tomcat + "/lib/jsp-api.jar"), null, null, null, null, false));
+			list.add(JavaCore.newLibraryEntry(new Path(tomcat + "/lib/el-api.jar"), null, null, null, null, false));
+			list.add(JavaCore.newLibraryEntry(new Path(tomcat + "/lib/annotations-api.jar"), null, null, null, null, false));
+			
+		}
+		return list.toArray(new IClasspathEntry[0]);
 	}
+
+//	public static IClasspathEntry[] computeClasspathEntry(LibraryLocation[] accessiblelibs, LibraryLocation[] discouragedlibs, LibraryLocation[] fobiddenlibs)
+//	throws CoreException {
+//		IClasspathEntry[] accessibleEntries = computeClasspathEntry(accessiblelibs, Accessible);
+//		IClasspathEntry[] discouragedEntries = computeClasspathEntry(discouragedlibs, Discouraged);
+//		IClasspathEntry[] fobiddenEntries = computeClasspathEntry(fobiddenlibs, Fobidden);
+//		IClasspathEntry[] allentries = new IClasspathEntry[accessibleEntries.length + discouragedEntries.length + fobiddenEntries.length];
+//		System.arraycopy(accessibleEntries, 0, allentries, 0, accessibleEntries.length);
+//		System.arraycopy(discouragedEntries, 0, allentries, accessibleEntries.length, discouragedEntries.length);
+//		System.arraycopy(fobiddenEntries, 0, allentries, accessibleEntries.length + discouragedEntries.length, fobiddenEntries.length);
+//		return allentries;
+//	}
 //	
 //	
 //	 public static IPath getModulesFolderPath()
@@ -113,10 +126,8 @@ public class ProjCoreUtility {
 //
 	public static IClasspathEntry[] computeClasspathEntry(LibraryLocation[] libs, IAccessRule[] rules) throws CoreException{
 		ArrayList<IClasspathEntry> list = new ArrayList<IClasspathEntry>();
-		if (libs != null)
-		{
-			for (LibraryLocation lib : libs)
-			{
+		if (libs != null){
+			for (LibraryLocation lib : libs){
 				IClasspathAttribute[] atts = new IClasspathAttribute[0];
 				if (lib.getDocLocation() != null)
 				{
@@ -130,14 +141,14 @@ public class ProjCoreUtility {
 		return list.toArray(new IClasspathEntry[0]);
 	}
 
-	public static ClasspathContainer getLFWClasspathContainer(IPath path, IJavaProject javaProject){
-		try{
-			return (ClasspathContainer) JavaCore.getClasspathContainer(path, javaProject);
-		}
-		catch (JavaModelException e){
-			return null;
-		}
-	}
+//	public static ClasspathContainer getLFWClasspathContainer(IPath path, IJavaProject javaProject){
+//		try{
+//			return (ClasspathContainer) JavaCore.getClasspathContainer(path, javaProject);
+//		}
+//		catch (JavaModelException e){
+//			return null;
+//		}
+//	}
 	
 //	
 //	public static void fileCopy(IFile form, IFile to) throws CoreException, IOException
@@ -172,6 +183,10 @@ public class ProjCoreUtility {
 	public static IClasspathEntry createJREEntry()
 	{
 		return JavaCore.newContainerEntry(new Path("org.eclipse.jdt.launching.JRE_CONTAINER"));
+	}
+	
+	public static IClasspathEntry createVarEntry(IPath path, IPath sourcePath) {
+		return JavaCore.newVariableEntry(path, sourcePath, null, false);
 	}
 
 	public static IClasspathEntry createSourceEntry(IProject project, String src, String output) throws CoreException

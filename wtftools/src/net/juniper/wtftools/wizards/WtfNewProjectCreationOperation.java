@@ -1,13 +1,19 @@
 package net.juniper.wtftools.wizards;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.juniper.wtftools.WtfToolsActivator;
+import net.juniper.wtftools.core.WtfProjectCommonTools;
 import net.juniper.wtftools.core.WtfToolsConstants;
+import net.juniper.wtftools.project.ClasspathComputer;
 import net.juniper.wtftools.project.ProjCoreUtility;
-import net.juniper.wtftools.project.WtfProjectClassPathContainerID;
 
+import org.apache.commons.io.FileUtils;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -33,118 +39,108 @@ public class WtfNewProjectCreationOperation extends WorkspaceModifyOperation
 		IProject project = createProject();
 		monitor.worked(1);
 
-		monitor.subTask("Updating project's classpath...");
-		computeInitClasspath(project);
-//		monitor.worked(1);
-//		monitor.subTask("Create build.properties");
-//		ProjCoreUtility.createBuildProperties(project);
-		monitor.worked(1);
-//		monitor.subTask("Create module configuation file");
-//		ProjCoreUtility.ceateInitManifest(project);
-//		monitor.worked(1);
+		writeConfigFiles(project);
 		
-//		final String context = projectProvider.getContext();
-//		final String docbase = projectProvider.getProject().getLocation().toString() + "/web";
-//		System.setProperty("context", context);
-//		boolean bl = writeConf(context, docbase);
-//		try {
-//			if(bl && createRsdFolder(docbase) && addRsdWebContextToProperty() && writeModuleToProperties()){
-//				project.refreshLocal(IProject.DEPTH_INFINITE, null);
-//			}
-//		} catch (Exception e) {
-//			WEBProjPlugin.getDefault().logError(e);
-//		}
+		monitor.subTask("Updating project's classpath...");
+		computeInitClasspath(project, monitor);
+		addApplicationFiles(project);
+		monitor.worked(1);
+		
+		project.refreshLocal(IProject.DEPTH_INFINITE, monitor);
 	}
 	
 
-//	/**
-// 	 * 生成Context文件
-// 	 * @param contex
-// 	 * @param docbase
-// 	 * @return
-// 	 */
-// 	private boolean writeConfiguration(String contex, String docbase){
-// 		String filePath = getContextFilePath(contex);
-// 		//ByteArrayInputStream stream = new ByteArrayInputStream(buffer.toString().getBytes());
-// 		File file = new File(filePath);
-// 		try{
-// 			if (file.exists()){
-// 				if (!MessageDialog.openQuestion(JavaPlugin.getActiveWorkbenchShell(), "信息", "web工程注册文件已经存在，是否覆盖？"))
-// 					return true;
-// 				//file.setContents(stream, true, true, null);
-// 				
-// 			}
-// 			StringBuffer buffer = new StringBuffer();
-// 			buffer.append("<!--\n");
-// 			buffer.append("    Context configuration file for the ");
-// 			buffer.append(contex);
-// 			buffer.append("\n-->\n\n");
-// 			buffer.append("<Context path=\"/");
-// 			buffer.append(contex);
-// 			buffer.append("\" docBase=\"");
-// 			buffer.append(docbase);
-// 			buffer.append("\" privileged=\"true\" antiResourceLocking=\"false\" antiJARLocking=\"false\" useNaming=\"false\" override=\"true\"  cachingAllowed=\"false\">\n");
-// 			buffer.append("\n    <WatchedResource>WEB-INF/web.xml</WatchedResource>\n\n</Context>\n");
-// 			FileUtilities.saveFile(filePath, buffer.toString().getBytes());
-// 		}
-// 		catch(Exception e){
-// 			WEBProjPlugin.getDefault().logError(e);
-// 			return false;
-// 		}
-// 		return true;
-// 	}
-// 	
-// 	/**
-// 	 * 得到context.xml文件路径
-// 	 * @param contex
-// 	 * @return
-// 	 */
-//	private String getContextFilePath(String contex) {
-//		String filePath = "";
-//		IPath tomcatPath = WEBProjPlugin.getTomcatHome();
-//		filePath = tomcatPath.toString().concat(CTX_FILE_PATH.concat(contex)).concat(".xml");
-//		return filePath;
-//	}
+
+	private void addApplicationFiles(IProject project) {
+		writeWebConfig(project);
+		if(true){
+			writeJpaConfig(project);
+		}
+		if(true){
+			copyHomeApplication(project);
+		}
+	}
+
+	private void writeWebConfig(IProject project) {
+		String webLocation = WtfProjectCommonTools.getFrameworkWebLocation();
+		try {
+			String projectPath = project.getLocation().toOSString();
+			FileUtils.copyDirectory(new File(webLocation + "/init"), new File(projectPath + "/web"));
+		} 
+		catch (IOException e) {
+			WtfToolsActivator.getDefault().logError(e);
+		}
+	}
+
+	private void copyHomeApplication(IProject project) {
+		String webLocation = WtfProjectCommonTools.getFrameworkWebLocation();
+		try {
+			String projectPath = project.getLocation().toOSString();
+			FileUtils.copyFile(new File(webLocation + "/index.html"), new File(projectPath + "/web/index.html"));
+			FileUtils.copyFile(new File(webLocation + "/rest/home.js"), new File(projectPath + "/web/rest/home.js"));
+			FileUtils.copyDirectory(new File(webLocation + "/applications/home"), new File(projectPath + "/web/applications/home"));
+		} 
+		catch (IOException e) {
+			WtfToolsActivator.getDefault().logError(e);
+		}
+	}
+
+	private void writeJpaConfig(IProject project) {
+		
+	}
+
+	private void writeConfigFiles(IProject project) {
+		if(WtfProjectCommonTools.isTomcat()){
+			writeTomcatConfig(project);
+			writeContextConfig();
+		}
+	}
+
+	private void writeContextConfig() {
+		
+	}
+
+	private void writeTomcatConfig(IProject project) {
+		TomcatHelper.writeConfigFile(project.getLocation().toOSString(), projectProvider.getContext());
+		TomcatHelper.writeContextFile(projectProvider.getContext(), project.getFullPath().append("web").toString());
+	}
 
 	private IProject createProject() throws CoreException
 	{
 		IProject project = projectProvider.getProject();
-		if (!project.exists())
-		{
+		if (!project.exists()){
 			ProjCoreUtility.createProject(project, projectProvider.getLocationPath(), null);
 			project.open(null);
 		}
 		List<String> natures = new ArrayList<String>();
 		natures.add(JavaCore.NATURE_ID);
 		natures.add(WtfToolsConstants.WTF_NATURE_ID);
-//		if (!project.hasNature(JavaCore.NATURE_ID))
-//		{
-//			ProjCoreUtility.addNatureToProject(project, JavaCore.NATURE_ID, null);
-//		}
-//		
-//		if (!project.hasNature(WtfToolsConstants.WTF_NATURE_ID))
+		if(WtfProjectCommonTools.isTomcat()){
+			natures.add(WtfToolsConstants.TOMCAT_NATURE_ID);
+		}
+		
 		ProjCoreUtility.addNatureToProject(project, natures.toArray(new String[0]), null);
-
 		return project;
 	}
 
-	private void computeInitClasspath(IProject project) throws CoreException
-	{
-		List<IClasspathEntry> list = new ArrayList<IClasspathEntry>();
-		list.add(ProjCoreUtility.createSourceEntry(project, projectProvider.getSrc(), projectProvider.getSrcOut()));
-//		list.add(ProjCoreUtility.createSourceEntry(project, fProjectProvider.getPrivateSrc(), fProjectProvider.getPrivateOut()));
-//		list.add(ProjCoreUtility.createSourceEntry(project, fProjectProvider.getClientSrc(), fProjectProvider.getClientOut()));
-//		//list.add(CoreUtility.createSourceEntry(project, fProjectProvider.getGenSrc(), fProjectProvider.getGenOut()));
-//		list.add(ProjCoreUtility.createSourceEntry(project, fProjectProvider.getResources(), fProjectProvider.getResourcesOut()));
-//		list.add(ProjCoreUtility.createSourceEntry(project, fProjectProvider.getTestSrc(), fProjectProvider.getTestOut()));
-		//
-		list.add(ProjCoreUtility.createJREEntry());
-		for (WtfProjectClassPathContainerID id : WtfProjectClassPathContainerID.values()){
-			list.add(ProjCoreUtility.createContainerClasspathEntry(id));	
-		}
-//		list.addAll(Arrays.asList(ProjCoreUtility.createLibEntries()));
-		
+	private void computeInitClasspath(IProject project, IProgressMonitor monitor) throws CoreException{
 		IJavaProject javaProject = JavaCore.create(project);
+		List<IClasspathEntry> list = new ArrayList<IClasspathEntry>();
+		list.add(ProjCoreUtility.createSourceEntry(project, "src/restapis", "bin"));
+		list.add(ProjCoreUtility.createSourceEntry(project, "src/services", "bin"));
+		list.add(ProjCoreUtility.createSourceEntry(project, "src/implements", "bin"));
+		list.add(ProjCoreUtility.createSourceEntry(project, "src/resources", "bin"));
 		javaProject.setRawClasspath(list.toArray(new IClasspathEntry[0]), null);
+		
+		IFolder folder = project.getFolder("web");
+		ProjCoreUtility.createFolder(folder);
+		
+		IFolder apps = project.getFolder("web/applications");
+		ProjCoreUtility.createFolder(apps);
+		
+		IFolder rest = project.getFolder("web/rest");
+		ProjCoreUtility.createFolder(rest);
+
+		ClasspathComputer.updateClasspath(project, monitor);
 	}
 }

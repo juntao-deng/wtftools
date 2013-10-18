@@ -11,9 +11,9 @@ public interface IProjectProvider
 
 	public IPath getLocationPath();
 	
-	public String getSrc();
+//	public String getSrc();
 
-	public String getSrcOut();
+//	public String getSrcOut();
 	
 	public String getContext();
 }

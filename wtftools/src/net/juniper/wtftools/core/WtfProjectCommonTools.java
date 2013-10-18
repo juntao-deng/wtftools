@@ -50,7 +50,10 @@ public final class WtfProjectCommonTools {
 //	}
 	
 	public static String getTomcatHome() {
-		return TomcatLauncherPlugin.getDefault().getTomcatDir();
+		String dir =  TomcatLauncherPlugin.getDefault().getTomcatDir();
+		if(dir == null)
+			return "";
+		return dir;
 	}
 	
 	public static IProject getCurrentProject() {
@@ -93,6 +96,10 @@ public final class WtfProjectCommonTools {
 	public static String getFrameworkLocation() {
 		IPreferenceStore store = WtfToolsActivator.getDefault().getPreferenceStore();
 		return store.getString(LOCATION_KEY);
+	}
+	
+	public static String getFrameworkWebLocation() {
+		return getFrameworkLocation() + "/src/main/webapp";
 	}
 	
 	private static Map<IProject, URLClassLoader> loaderMap = new HashMap<IProject, URLClassLoader>();
@@ -188,4 +195,12 @@ public final class WtfProjectCommonTools {
 	     IFileStore store = fs.fromLocalFile(new File(filename));
 	     store.putInfo(fileinfo, EFS.SET_ATTRIBUTES, null);
 	 }
+	
+	public static String getMiddleware() {
+		return "tomcat";
+	}
+	
+	public static boolean isTomcat() {
+		return getMiddleware().equals("tomcat");
+	}
 }

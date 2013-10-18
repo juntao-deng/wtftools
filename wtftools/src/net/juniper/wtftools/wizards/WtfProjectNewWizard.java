@@ -72,16 +72,6 @@ public class WtfProjectNewWizard extends Wizard implements INewWizard {
                     return page1.getLocationPath();
                 }
 
-    			@Override
-    			public String getSrc() {
-    				return "/web-src";
-    			}
-
-    			@Override
-    			public String getSrcOut() {
-    				return "/build/classes";
-    			}
-
 				@Override
 				public String getContext() {
 					return page2.getContext();

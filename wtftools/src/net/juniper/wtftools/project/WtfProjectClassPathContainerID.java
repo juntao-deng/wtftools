@@ -8,7 +8,7 @@ import org.eclipse.core.runtime.Path;
 
 public enum WtfProjectClassPathContainerID 
 {
-	JBoss_Library,
+	Middleware_Library,
 	ThdParty_Library;
 	
 	public IPath getPath()

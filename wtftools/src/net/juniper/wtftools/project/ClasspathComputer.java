@@ -26,13 +26,7 @@ import org.eclipse.jdt.core.JavaConventions;
 import org.eclipse.jdt.core.JavaCore;
 
 public class ClasspathComputer{
-//	private static final List<String> tomcatLibList = new ArrayList<String>();
-//	static{
-//		tomcatLibList.add("jsp-api.jar");
-//		tomcatLibList.add("servlet-api.jar");
-//		tomcatLibList.add("el-api.jar");
-//	}
-//	
+
 	public static void updateClasspath(IProject project, IProgressMonitor monitor) throws CoreException{
 		if (project != null && project.hasNature(WtfToolsConstants.WTF_NATURE_ID)){
 			monitor.subTask("Update classpath");
@@ -41,51 +35,16 @@ public class ClasspathComputer{
 			javaProject.setRawClasspath(entries, monitor);
 		}
 	}
-////
-////	public static LFWLibraryLocation[] computeStandCP(IFolder... baseFolders) throws CoreException
-////	{
-////		ArrayList<LFWLibraryLocation> llist = new ArrayList<LFWLibraryLocation>();
-////		for (IFolder folder : baseFolders)
-////		{
-////			IFolder classes = folder.getFolder(ClasspathConstants.CLASSES);
-////			IFolder resources = folder.getFolder(ClasspathConstants.RESOURCES);
-////			if (classes.exists())
-////			{
-////				llist.add(new LFWLibraryLocation(classes));
-////			}
-////			if (resources.exists())
-////			{
-////				//llist.addAll(Arrays.asList(computeJarsInPath(resources)));
-////				llist.add(new LFWLibraryLocation(resources));
-////			}
-////			//
-////			IFolder varclass = folder.getFolder(ClasspathConstants.VAR_CLASSES);
-////			if (varclass.exists())
-////			{
-////				llist.add(new LFWLibraryLocation(varclass));
-////			}
-////			//
-////			IFolder extclass = folder.getFolder(ClasspathConstants.EXTENSION_CLASSES);
-////			if (extclass.exists())
-////			{
-////				llist.add(new LFWLibraryLocation(extclass));
-////			}
-////			llist.addAll(Arrays.asList(computeJarsInPath(folder.getFolder(ClasspathConstants.LIB))));
-////		}
-////		return llist.toArray(new LFWLibraryLocation[0]);
-////	}
-//
-	private static IClasspathEntry[] getClasspath(IProject project, boolean clear) throws CoreException{
+
+	public static IClasspathEntry[] getClasspath(IProject project, boolean clear) throws CoreException{
 		IJavaProject javaproject = JavaCore.create(project);
 		ArrayList<IClasspathEntry> result = new ArrayList<IClasspathEntry>();
 		addSourceAndLibraries(javaproject, clear, result);
 		result.add(ProjCoreUtility.createJREEntry());
 		for (WtfProjectClassPathContainerID id : WtfProjectClassPathContainerID.values()){
-//			ClasspathContainer container = ProjCoreUtility.getLFWClasspathContainer(id.getPath(), javaproject);
-//			container.setClasspathEntries(ProjCoreUtility.getClasspathEntry(project, id));
 			result.add(ProjCoreUtility.createContainerClasspathEntry(id));
-//			result.addAll(Arrays.asList(ProjCoreUtility.createLibEntries()));
 		}
+		
 		
 		IClasspathEntry[] entries = result.toArray(new IClasspathEntry[result.size()]);
 		IJavaModelStatus validation = JavaConventions.validateClasspath(javaproject, entries, javaproject.getOutputLocation());
@@ -119,29 +78,29 @@ public class ClasspathComputer{
 //		result.add(resEntry);
 	}
 	
-	/**
-	 * get jboss library list
-	 * @param folders
-	 * @return
-	 * @throws CoreException
-	 */
-	public static LibraryLocation[] computeJbossJarsInPath(IPath path) throws CoreException{
-		List<LibraryLocation> list = new ArrayList<LibraryLocation>();
-//		LibraryLocation[] locations = computeJarsInPath(path);
-//		for (int i = 0; i < locations.length; i++) {
-//			LibraryLocation loc = locations[i];
-//			String jarName = loc.getLibPath().lastSegment();
-//			if(isTomcatLib(jarName)){
-//				list.add(loc);
-//			}
-//		}
-		IPath fpath = Path.fromOSString("D:/devtemp/a.jar");
-		Workspace wp = (Workspace) ResourcesPlugin.getWorkspace();
-		IFile file = (IFile) wp.newResource(fpath, IResource.FILE);
-		LibraryLocation lib = new LibraryLocation(file);
-		list.add(lib);
-		return list.toArray(new LibraryLocation[0]);
-	}
+//	/**
+//	 * get jboss library list
+//	 * @param folders
+//	 * @return
+//	 * @throws CoreException
+//	 */
+//	public static LibraryLocation[] computeMiddlewareJarsInPath(String middleware, IPath path) throws CoreException{
+//		List<LibraryLocation> list = new ArrayList<LibraryLocation>();
+////		LibraryLocation[] locations = computeJarsInPath(path);
+////		for (int i = 0; i < locations.length; i++) {
+////			LibraryLocation loc = locations[i];
+////			String jarName = loc.getLibPath().lastSegment();
+////			if(isTomcatLib(jarName)){
+////				list.add(loc);
+////			}
+////		}
+//		IPath fpath = Path.fromOSString("D:/devtemp/a.jar");
+//		Workspace wp = (Workspace) ResourcesPlugin.getWorkspace();
+//		IFile file = (IFile) wp.newResource(fpath, IResource.FILE);
+//		LibraryLocation lib = new LibraryLocation(file);
+//		list.add(lib);
+//		return list.toArray(new LibraryLocation[0]);
+//	}
 	
 	/**
 	 * 锟斤拷锟絉SD jar锟侥硷拷锟叫憋拷
