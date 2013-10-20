@@ -78,11 +78,11 @@ public class ProjCoreUtility {
 				WtfToolsActivator.getDefault().logError("Please config tomcat's path first");
 				return new IClasspathEntry[0];
 			}
-			IPath path = Path.fromOSString(WtfProjectCommonTools.getTomcatHome());
 			switch (id){
 				case Middleware_Library:
 					return computeMiddlewareJarsInPath();
 				case ThdParty_Library:
+					String path = WtfProjectCommonTools.getFrameworkWebLocation() + "/init/thirdparty.txt";
 					return computeClasspathEntry(ClasspathComputer.compute3rdPartyJarsInPath(path), Accessible);
 				default:
 					return new IClasspathEntry[0];

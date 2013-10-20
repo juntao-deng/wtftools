@@ -1,6 +1,7 @@
 package net.juniper.wtftools.core;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.Map;
 
 import net.juniper.wtftools.WtfToolsActivator;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
@@ -31,6 +33,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.IWorkbenchPage;
@@ -202,5 +205,20 @@ public final class WtfProjectCommonTools {
 	
 	public static boolean isTomcat() {
 		return getMiddleware().equals("tomcat");
+	}
+
+	public static String getCurrentProjectCtx() {
+		String str;
+		try {
+			str = FileUtils.readFileToString(new File(getCurrentProject().getFile(".tomcatplugin").getLocation().toString()));
+			int begin = str.indexOf("<webPath>") + "<webPath>".length() + 1;
+			int end = str.indexOf("</webPath>");
+			String ctx = str.substring(begin, end);
+			return ctx;
+		} catch (IOException e) {
+			WtfToolsActivator.getDefault().logError(e);
+			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", "Get context path error");
+			return null;
+		}
 	}
 }

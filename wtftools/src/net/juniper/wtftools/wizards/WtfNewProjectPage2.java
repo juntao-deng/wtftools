@@ -9,7 +9,6 @@ import org.eclipse.jdt.internal.ui.wizards.dialogfields.LayoutUtil;
 import org.eclipse.jdt.internal.ui.wizards.dialogfields.SelectionButtonDialogField;
 import org.eclipse.jdt.internal.ui.wizards.dialogfields.StringDialogField;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.preference.DirectoryFieldEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
@@ -22,14 +21,16 @@ public class WtfNewProjectPage2 extends WizardPage implements  IPropertyChangeLi
  {
 	public static String lfwprojectPath;
 	private boolean fInited = false;
-	public static String context;
+//	public static String context;
 	//public static String docname;
 	public static IProject project;
 	private StringDialogField contextPath;
 //	private checkb
 	//private StringDialogField docNameNode;
-	private DirectoryFieldEditor docbasePath;
+//	private DirectoryFieldEditor docbasePath;
+	private SelectionButtonDialogField homePageField;
 	
+	private SelectionButtonDialogField jpaConfigField;
 	
 	private StringDialogField createStringDialogField(String labeltext, Composite parent)
 	{
@@ -66,26 +67,26 @@ public class WtfNewProjectPage2 extends WizardPage implements  IPropertyChangeLi
 	}
 
 
-	public DirectoryFieldEditor getDocbasePath() {
-		return docbasePath;
-	}
+//	public DirectoryFieldEditor getDocbasePath() {
+//		return docbasePath;
+//	}
+//
+//
+//
+//
+//	public void setDocbasePath(DirectoryFieldEditor docbasePath) {
+//		this.docbasePath = docbasePath;
+//	}
 
-
-
-
-	public void setDocbasePath(DirectoryFieldEditor docbasePath) {
-		this.docbasePath = docbasePath;
-	}
-
-	private String docbase;
-	
-	public String getDocbase() {
-		return docbasePath.getStringValue();
-	}
-
-	public void setDocbase(String docbase) {
-		this.docbase = docbase;
-	}
+//	private String docbase;
+//	
+//	public String getDocbase() {
+//		return docbasePath.getStringValue();
+//	}
+//
+//	public void setDocbase(String docbase) {
+//		this.docbase = docbase;
+//	}
 
 	
 //	public static void setDocnmae(String docname){
@@ -97,19 +98,19 @@ public class WtfNewProjectPage2 extends WizardPage implements  IPropertyChangeLi
 	}
 
 
-	public StringDialogField getContextPath() {
-		return contextPath;
+//	public StringDialogField getContextPath() {
+//		return contextPath;
+//	}
+
+//	public void setContextPath(StringDialogField contextPath) {
+//		this.contextPath = contextPath;
+//	}
+
+	public void setContext(String context) {
+		contextPath.setText(context);
 	}
 
-	public void setContextPath(StringDialogField contextPath) {
-		this.contextPath = contextPath;
-	}
 
-	public static void setContext(String context) {
-		WtfNewProjectPage2.context = context;
-	}
-
-//	private SelectionButtonDialogField isPortalProject;
 //	public SelectionButtonDialogField getIsPortalProject() {
 //		return isPortalProject;
 //	}
@@ -118,26 +119,26 @@ public class WtfNewProjectPage2 extends WizardPage implements  IPropertyChangeLi
 //		this.isPortalProject = isPortalProject;
 //	}
 
-	public void createControl(Composite parent)
-	{
+	public void createControl(Composite parent){
 		final Composite composite = new Composite(parent, SWT.NULL);
 		composite.setLayout(initGridLayout(new GridLayout(2, false), true));
 		
 		contextPath = createStringDialogField("Context Path", composite);
 		
-		//isPortalProject = createCheckBoxField("是否Portal工程", composite);
+		homePageField = createCheckBoxField("With Home Page", composite);
+		
+		jpaConfigField = createCheckBoxField("Jpa Configuration", composite);
 		
 		setControl(composite);
 		fInited = true;
 	}
 
 	
-	private String getCurrentLFWPath(){
-		return lfwprojectPath + "/web";
-	}
+//	private String getCurrentLFWPath(){
+//		return lfwprojectPath + "/web";
+//	}
 	
-	protected GridLayout initGridLayout(GridLayout layout, boolean margins)
-	{
+	protected GridLayout initGridLayout(GridLayout layout, boolean margins){
 		layout.horizontalSpacing = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_SPACING);
 		layout.verticalSpacing = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_SPACING);
 		if (margins)
@@ -153,25 +154,24 @@ public class WtfNewProjectPage2 extends WizardPage implements  IPropertyChangeLi
 		return layout;
 	}
 
-	private void validate()
-	{
-		if(contextPath != null){
-			setContext(contextPath.getText());
-			if(getContext().equals("")){
-				//setErrorMessage("Context不能为空");
-				setPageComplete(false);
-				//return false;
-			}
-			Pattern pattern = Pattern.compile("[!@~#$%^&*-+]+");//just test
-			if(pattern.matcher(getContext().trim()).find())
-			{
-				//setErrorMessage("Context中请不要包含: ! @ ~ # $ % ^ & * - + 等特殊符号!");
-				setPageComplete(false);
-				//return false;
-			}
-			
-		}
-		setPageComplete(true);
+	private void validate(){
+//		if(contextPath != null){
+//			setContext(contextPath.getText());
+//			if(getContext().equals("")){
+//				//setErrorMessage("Context不能为空");
+//				setPageComplete(false);
+//				//return false;
+//			}
+//			Pattern pattern = Pattern.compile("[!@~#$%^&*-+]+");//just test
+//			if(pattern.matcher(getContext().trim()).find())
+//			{
+//				//setErrorMessage("Context中请不要包含: ! @ ~ # $ % ^ & * - + 等特殊符号!");
+//				setPageComplete(false);
+//				//return false;
+//			}
+//			
+//		}
+//		setPageComplete(true);
 		//return true;
 	}
 

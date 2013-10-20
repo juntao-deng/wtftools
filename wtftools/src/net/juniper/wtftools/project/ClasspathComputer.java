@@ -1,15 +1,16 @@
 package net.juniper.wtftools.project;
 
 import java.io.File;
-import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 
+import net.juniper.wtftools.WtfToolsActivator;
 import net.juniper.wtftools.core.WtfToolsConstants;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.core.internal.resources.Workspace;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -103,21 +104,31 @@ public class ClasspathComputer{
 //	}
 	
 	/**
-	 * 锟斤拷锟絉SD jar锟侥硷拷锟叫憋拷
 	 * @param folders
 	 * @return
 	 * @throws CoreException
 	 */
-	public static LibraryLocation[] compute3rdPartyJarsInPath(IPath path) throws CoreException{
+	public static LibraryLocation[] compute3rdPartyJarsInPath(String path) throws CoreException{
 		List<LibraryLocation> list = new ArrayList<LibraryLocation>();
-//		LibraryLocation[] locations = computeJarsInPath(path);
-//		for (int i = 0; i < locations.length; i++) {
-//			LibraryLocation loc = locations[i];
-//			String jarName = loc.getLibPath().lastSegment();
-//			if(isRSDLib(jarName)){
-//				list.add(loc);
-//			}
-//		}
+		try {
+			List lines = FileUtils.readLines(new File(path));
+			if(lines != null){
+				Iterator it = lines.iterator();
+				Workspace wp = (Workspace) ResourcesPlugin.getWorkspace();
+				while(it.hasNext()){
+					String line = (String) it.next();
+					File f = new File(line);
+					if(f.exists()){
+						IPath fpath = Path.fromOSString(line);
+						IFile file = (IFile) wp.newResource(fpath, IResource.FILE);
+						list.add(new LibraryLocation(file));
+					}
+				}
+			}
+		} 
+		catch (IOException e) {
+			WtfToolsActivator.getDefault().logError(e);
+		}
 		return list.toArray(new LibraryLocation[0]);
 	}
 //	
@@ -154,34 +165,34 @@ public class ClasspathComputer{
 //		return false;
 //	}
 //
-	private static LibraryLocation[] computeJarsInPath(IPath path) throws CoreException{
-		File dir = new File(path.toString());
-
-		List<LibraryLocation> filterList = new ArrayList<LibraryLocation>();
-		if (dir.exists()){
-			File[] fs = dir.listFiles(new FilenameFilter() {
-				@Override
-				public boolean accept(File dir, String name) {
-					return name.endsWith(".jar");
-				}
-			});
-			
-			
-			for(int i = 0; i < fs.length; i ++){
-				Workspace wp = (Workspace) ResourcesPlugin.getWorkspace();
-				IPath fpath = new Path(fs[i].getAbsolutePath());
-				IFile file = (IFile) wp.newResource(fpath, IResource.FILE);
-				filterList.add(new LibraryLocation(file));
-			}
-		}
-			
-		LibraryLocation[] rets = filterList.toArray(new LibraryLocation[0]);
-		Arrays.sort(rets, new Comparator<LibraryLocation>(){
-			public int compare(LibraryLocation o1, LibraryLocation o2)
-			{
-				return o1.getLibResource().getName().compareToIgnoreCase(o2.getLibResource().getName());
-			}
-		});
-		return rets;
-	}
+//	private static LibraryLocation[] computeJarsInPath(IPath path) throws CoreException{
+//		File dir = new File(path.toString());
+//
+//		List<LibraryLocation> filterList = new ArrayList<LibraryLocation>();
+//		if (dir.exists()){
+//			File[] fs = dir.listFiles(new FilenameFilter() {
+//				@Override
+//				public boolean accept(File dir, String name) {
+//					return name.endsWith(".jar");
+//				}
+//			});
+//			
+//			
+//			for(int i = 0; i < fs.length; i ++){
+//				Workspace wp = (Workspace) ResourcesPlugin.getWorkspace();
+//				IPath fpath = new Path(fs[i].getAbsolutePath());
+//				IFile file = (IFile) wp.newResource(fpath, IResource.FILE);
+//				filterList.add(new LibraryLocation(file));
+//			}
+//		}
+//			
+//		LibraryLocation[] rets = filterList.toArray(new LibraryLocation[0]);
+//		Arrays.sort(rets, new Comparator<LibraryLocation>(){
+//			public int compare(LibraryLocation o1, LibraryLocation o2)
+//			{
+//				return o1.getLibResource().getName().compareToIgnoreCase(o2.getLibResource().getName());
+//			}
+//		});
+//		return rets;
+//	}
 }

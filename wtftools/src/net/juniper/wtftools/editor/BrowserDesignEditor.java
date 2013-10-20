@@ -12,6 +12,8 @@ import net.sf.json.JSONObject;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.SWT;
@@ -53,6 +55,12 @@ public class BrowserDesignEditor extends EditorPart {
 		controllerMap.clear();
 		htmlContent = null;
 		setDirty(false);
+		try {
+			WtfProjectCommonTools.getCurrentProject().refreshLocal(IProject.DEPTH_INFINITE, null);
+		} 
+		catch (CoreException e) {
+			WtfToolsActivator.getDefault().logError(e);
+		}
 	}
 
 	@Override
@@ -111,20 +119,23 @@ public class BrowserDesignEditor extends EditorPart {
 			browser.execute("FwBase.Wtf.Design.DesignSupport.fireInput('" + result + "')");
 		}
 	}
-
 	private String getUrl() {
 		try {
+			String ctx = WtfProjectCommonTools.getCurrentProjectCtx();
 			String[] appPaths = getAppPath();
-			String appDir = StringUtils.join(appPaths, "/", 0, appPaths.length - 1);
+			String appDir = ctx + "/" + StringUtils.join(appPaths, "/", 0, appPaths.length - 1);
 			String designBasePath = getDesignBasePath();
-			String remoteUrl = "file:///" + designBasePath;
+//			String remoteUrl = "file:///" + designBasePath;
 			String replaceStr = APP_REPLACE.replace("#REPLACE#", appDir);
 			File template = new File(designBasePath + "design.html");
 			String templateStr = FileUtils.readFileToString(template);
-			String generatedPath = TEMP_WORK_DIR + appDir + "/design.html";
+			String generatedPath = TEMP_WORK_DIR + "/" + appDir + "/design.html";
 			File target = new File(generatedPath);
 			String result = templateStr.replace("#REPLACE#", replaceStr);
-			result = result.replaceAll("#REPLACE_URL#", remoteUrl);
+			
+			result = result.replace("#CTX#", ctx);
+			result = result.replaceAll("#FRAME_PATH#", WtfProjectCommonTools.getFrameworkWebLocation() + "/");
+			result = result.replace("#CTXPATH#", WtfProjectCommonTools.getCurrentWtfProject().getLocation().toOSString() + "/web/");
 			FileUtils.writeStringToFile(target, result);
 			return "file:///" + generatedPath;
 		} 
@@ -135,7 +146,7 @@ public class BrowserDesignEditor extends EditorPart {
 	}
 
 	private String getDesignBasePath() {
-		return WtfProjectCommonTools.getFrameworkLocation() + "/src/main/webapp/designsupport/";
+		return WtfProjectCommonTools.getFrameworkWebLocation() + "/designsupport/";
 	}
 
 	private String[] getAppPath() {

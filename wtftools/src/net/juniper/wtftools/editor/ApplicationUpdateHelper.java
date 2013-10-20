@@ -115,10 +115,10 @@ public class ApplicationUpdateHelper {
 
 	private static void processNode(Node node) {
 		NodeList cList = node.getChildren();
-		if(node instanceof Div && ((Div)node).getAttribute("wtftype") != null && ((Div)node).getAttribute("wtftype").equals("container")){
-			node.getParent().setChildren(cList);
-		}
-		else if(node instanceof Div && ((Div)node).getAttribute("wtftype") != null && ((Div)node).getAttribute("wtftype").equals("template")){
+//		if(node instanceof Div && ((Div)node).getAttribute("wtftype") != null && ((Div)node).getAttribute("wtftype").equals("container")){
+//			node.getParent().setChildren(cList);
+//		}
+		if(node instanceof Div && ((Div)node).getAttribute("wtftype") != null && ((Div)node).getAttribute("wtftype").equals("template")){
 			node.setChildren(null);
 			cList = null;
 		}

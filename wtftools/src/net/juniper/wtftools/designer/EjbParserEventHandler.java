@@ -102,7 +102,7 @@ public class EjbParserEventHandler extends AbstractBrowserEventHandler{
 			Class c = Class.forName(className, true, WtfProjectCommonTools.getCurrentProjectClassLoader());
 			JSONObject result = new JSONObject();
 			JSONArray columnInfos = getColumnInfos(c);
-			result.put("columns", columnInfos); 
+			result.put("columnInfos", columnInfos); 
 			return result;
 		}
 		catch(EventHandlerException e){

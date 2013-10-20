@@ -38,7 +38,7 @@ public class LibraryLocation{
 		IResource res = getLibResource();
 		if (res instanceof IFile){
 			IFile file = (IFile) res;
-			IFile srcjar = file.getParent().getFile(new Path(file.getName().substring(0, file.getName().lastIndexOf('.')) + "_src." + file.getFileExtension()));
+			IFile srcjar = file.getParent().getFile(new Path(file.getName().substring(0, file.getName().lastIndexOf('.')) + "_sources." + file.getFileExtension()));
 			if (srcjar.getFullPath().toFile().exists())
 			{
 				return srcjar.getFullPath();

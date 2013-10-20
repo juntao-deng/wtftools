@@ -65,7 +65,7 @@ public class WtfNewProjectCreationOperation extends WorkspaceModifyOperation
 		String webLocation = WtfProjectCommonTools.getFrameworkWebLocation();
 		try {
 			String projectPath = project.getLocation().toOSString();
-			FileUtils.copyDirectory(new File(webLocation + "/init"), new File(projectPath + "/web"));
+			FileUtils.copyDirectory(new File(webLocation + "/init/copy"), new File(projectPath + "/web"));
 		} 
 		catch (IOException e) {
 			WtfToolsActivator.getDefault().logError(e);
@@ -73,12 +73,34 @@ public class WtfNewProjectCreationOperation extends WorkspaceModifyOperation
 	}
 
 	private void copyHomeApplication(IProject project) {
-		String webLocation = WtfProjectCommonTools.getFrameworkWebLocation();
+		String fwLocation = WtfProjectCommonTools.getFrameworkWebLocation() + "/";
 		try {
 			String projectPath = project.getLocation().toOSString();
-			FileUtils.copyFile(new File(webLocation + "/index.html"), new File(projectPath + "/web/index.html"));
-			FileUtils.copyFile(new File(webLocation + "/rest/home.js"), new File(projectPath + "/web/rest/home.js"));
-			FileUtils.copyDirectory(new File(webLocation + "/applications/home"), new File(projectPath + "/web/applications/home"));
+			String projectLocation = projectPath + "/web/";
+			FileUtils.copyFile(new File(fwLocation + "index.html"), new File(projectLocation + "index.html"));
+			FileUtils.copyFile(new File(fwLocation + "rest/home.js"), new File(projectLocation + "rest/home.js"));
+			FileUtils.copyFile(new File(fwLocation + "rest/dashboard.js"), new File(projectLocation + "rest/dashboard.js"));
+			FileUtils.copyDirectory(new File(fwLocation + "applications/home"), new File(projectLocation + "applications/home"));
+			FileUtils.copyDirectory(new File(fwLocation + "applications/dashboard"), new File(projectLocation + "applications/dashboard"));
+			
+			updateFileContent(fwLocation, projectLocation);
+		} 
+		catch (IOException e) {
+			WtfToolsActivator.getDefault().logError(e);
+		}
+	}
+
+	private void updateFileContent(String webLocation, String projectPath) {
+		try {
+			String indexContent = FileUtils.readFileToString(new File(projectPath + "index.html"));
+			indexContent = indexContent.replaceAll("#FRAME_PATH#", webLocation);
+			indexContent = indexContent.replace("#CTX#", projectProvider.getContext());
+			indexContent = indexContent.replace("#CTXPATH#", projectPath);
+			FileUtils.writeStringToFile(new File(projectPath + "index.html"), indexContent);
+			
+			String restContent = FileUtils.readFileToString(new File(projectPath + "rest/home.js"));
+			restContent = restContent.replaceAll("#CTX#", projectProvider.getContext());
+			FileUtils.writeStringToFile(new File(projectPath + "rest/home.js"), restContent);
 		} 
 		catch (IOException e) {
 			WtfToolsActivator.getDefault().logError(e);
