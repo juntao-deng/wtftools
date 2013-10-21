@@ -81,8 +81,10 @@ public class EjbParserEventHandler extends AbstractBrowserEventHandler{
 				json.put("isid", true);
 			
 			String cName = StringUtils.capitalize(name);
-			json.put("id", name);
-			json.put("name", cName);
+			json.put("name", name);
+			json.put("text", cName);
+			json.put("visible", true);
+			json.put("sortable", true);
 			return json;
 		} 
 		catch (Exception e) {
