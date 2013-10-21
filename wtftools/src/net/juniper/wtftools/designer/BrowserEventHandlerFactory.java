@@ -25,6 +25,9 @@ public class BrowserEventHandlerFactory {
 				break;
 			}
 		}
+		if(result != null){
+			result.put("eventId", json.get("eventId"));
+		}
 		return result;
 	}
 
