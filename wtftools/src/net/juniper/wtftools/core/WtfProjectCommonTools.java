@@ -102,7 +102,7 @@ public final class WtfProjectCommonTools {
 	}
 	
 	public static String getFrameworkWebLocation() {
-		return getFrameworkLocation() + "/src/main/webapp";
+		return getFrameworkLocation() + "/web";
 	}
 	
 	private static Map<IProject, URLClassLoader> loaderMap = new HashMap<IProject, URLClassLoader>();

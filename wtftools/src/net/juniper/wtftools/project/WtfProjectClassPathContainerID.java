@@ -9,6 +9,7 @@ import org.eclipse.core.runtime.Path;
 public enum WtfProjectClassPathContainerID 
 {
 	Middleware_Library,
+	Product_Common,
 	ThdParty_Library;
 	
 	public IPath getPath()

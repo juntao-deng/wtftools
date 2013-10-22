@@ -1,5 +1,6 @@
 package net.juniper.wtftools.project;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,6 +8,7 @@ import net.juniper.wtftools.WtfToolsActivator;
 import net.juniper.wtftools.core.WtfProjectCommonTools;
 import net.juniper.wtftools.core.WtfToolsConstants;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -84,6 +86,9 @@ public class ProjCoreUtility {
 				case ThdParty_Library:
 					String path = WtfProjectCommonTools.getFrameworkWebLocation() + "/init/thirdparty.txt";
 					return computeClasspathEntry(ClasspathComputer.compute3rdPartyJarsInPath(path), Accessible);
+				case Product_Common:
+					String dir = WtfProjectCommonTools.getFrameworkWebLocation() + "/init/common-lib";
+					return computeClasspathEntry(ClasspathComputer.computeProductJarsInPath(dir), Accessible);
 				default:
 					return new IClasspathEntry[0];
 			}
@@ -189,17 +194,17 @@ public class ProjCoreUtility {
 		return JavaCore.newVariableEntry(path, sourcePath, null, false);
 	}
 
-	public static IClasspathEntry createSourceEntry(IProject project, String src, String output) throws CoreException
+	public static IClasspathEntry createSourceEntry(IProject project, String src) throws CoreException
 	{
 		IFolder folder = project.getFolder(src);
 		if (!folder.exists())
 			ProjCoreUtility.createFolder(folder);
-		folder = project.getFolder(output);
-		if (!folder.exists())
-			ProjCoreUtility.createFolder(folder);
+//		folder = project.getFolder(output);
+//		if (!folder.exists())
+//			ProjCoreUtility.createFolder(folder);
 		IPath path = project.getFullPath().append(src);
-		IPath outPath = project.getFullPath().append(output);
-		return JavaCore.newSourceEntry(path, new IPath[0], new IPath[0], outPath);
+//		IPath outPath = project.getFullPath().append(output);
+		return JavaCore.newSourceEntry(path, new IPath[0]);
 	}
 //
 //	public static IFolder creatFolderLink(IProject project, String folderName, final IPath linkPath) throws CoreException
@@ -369,6 +374,36 @@ public class ProjCoreUtility {
 	}
 
 	public static void updateWorkspaceClasspath(IProgressMonitor monitor){
+		if(WtfProjectCommonTools.isTomcat()){
+			String path = WtfProjectCommonTools.getFrameworkWebLocation() + "/init/thirdparty.txt";
+			try {
+				LibraryLocation[] locations = ClasspathComputer.compute3rdPartyJarsInPath(path);
+				for(int i = 0; i < locations.length; i ++){
+					String libDir = WtfProjectCommonTools.getTomcatHome() + "/lib";
+					File dir = new File(libDir);
+					String fileStr = locations[i].getLibPath().toOSString();
+					FileUtils.copyFileToDirectory(new File(fileStr), dir);
+				}
+			} 
+			catch (Exception e) {
+				WtfToolsActivator.getDefault().logError(e);
+			}
+			
+			
+			try {
+				String dirPath = WtfProjectCommonTools.getFrameworkWebLocation() + "/init/common-lib";
+				LibraryLocation[] locations = ClasspathComputer.computeProductJarsInPath(dirPath);
+				for(int i = 0; i < locations.length; i ++){
+					String libDir = WtfProjectCommonTools.getTomcatHome() + "/lib";
+					File dir = new File(libDir);
+					String fileStr = locations[i].getLibPath().toOSString();
+					FileUtils.copyFileToDirectory(new File(fileStr), dir);
+				}
+			} 
+			catch (Exception e) {
+				WtfToolsActivator.getDefault().logError(e);
+			}
+		}
 		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 		for (IProject project : projects){
 			try{

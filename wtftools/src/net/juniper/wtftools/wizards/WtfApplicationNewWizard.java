@@ -64,8 +64,13 @@ public class WtfApplicationNewWizard extends Wizard implements INewWizard {
 			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", "Application already exsits");
 			return false;
 		}
+		String leafId = appId;
+		int index = appId.lastIndexOf("/");
+		if(index != -1){
+			leafId = appId.substring(index + 1);
+		}
 		try {
-			createApplication(f, appId);
+			createApplication(f, leafId);
 		} 
 		catch (IOException e) {
 			WtfToolsActivator.getDefault().logError(e);
@@ -74,7 +79,7 @@ public class WtfApplicationNewWizard extends Wizard implements INewWizard {
 		}
 		
 		try {
-			IFile file = WtfProjectCommonTools.getCurrentProject().getFile("web/applications/" + appId + "/" + appId + ".html");
+			IFile file = WtfProjectCommonTools.getCurrentProject().getFile("web/applications/" + appId + "/" + leafId + ".html");
 			IEditorInput input = new FileEditorInput(file);
 			
 			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(input, "net.juniper.wtftools.editor.BrowserDesignEditor");

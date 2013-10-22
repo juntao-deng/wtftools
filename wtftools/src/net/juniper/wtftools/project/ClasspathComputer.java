@@ -1,6 +1,7 @@
 package net.juniper.wtftools.project;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -33,7 +34,7 @@ public class ClasspathComputer{
 			monitor.subTask("Update classpath");
 			IJavaProject javaProject = JavaCore.create(project);
 			IClasspathEntry[] entries = getClasspath(project, false);
-			javaProject.setRawClasspath(entries, monitor);
+			javaProject.setRawClasspath(entries, javaProject.getPath().append("web/WEB-INF/classes"), monitor);
 		}
 	}
 
@@ -195,4 +196,27 @@ public class ClasspathComputer{
 //		});
 //		return rets;
 //	}
+
+	public static LibraryLocation[] computeProductJarsInPath(String path) {
+		List<LibraryLocation> list = new ArrayList<LibraryLocation>();
+		File dir = new File(path);
+		if(dir.exists()){
+			File[] fs = dir.listFiles(new FilenameFilter(){
+				@Override
+				public boolean accept(File dir, String name) {
+					return name.endsWith(".jar") && !name.endsWith("-sources.jar");
+				}
+				
+			});
+			if(fs != null && fs.length > 0){
+				Workspace wp = (Workspace) ResourcesPlugin.getWorkspace();
+				for(int i = 0; i < fs.length; i ++){
+					IPath fpath = Path.fromOSString(fs[i].getAbsolutePath());
+					IFile file = (IFile) wp.newResource(fpath, IResource.FILE);
+					list.add(new LibraryLocation(file));
+				}
+			}
+		}
+		return list.toArray(new LibraryLocation[0]);
+	}
 }

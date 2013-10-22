@@ -25,7 +25,7 @@ public class LibraryLocation{
 		IResource res = getLibResource();
 		if (res instanceof IFile){
 			IFile file = (IFile) res;
-			IFile docjar = file.getParent().getFile(new Path(file.getName().substring(0, file.getName().lastIndexOf('.')) + "_doc." + file.getFileExtension()));
+			IFile docjar = file.getParent().getFile(new Path(file.getName().substring(0, file.getName().lastIndexOf('.')) + "-javadoc." + file.getFileExtension()));
 			if (docjar.exists())
 			{
 				return "jar:file:/" + docjar.getLocation().toOSString() + "!/";
@@ -38,7 +38,7 @@ public class LibraryLocation{
 		IResource res = getLibResource();
 		if (res instanceof IFile){
 			IFile file = (IFile) res;
-			IFile srcjar = file.getParent().getFile(new Path(file.getName().substring(0, file.getName().lastIndexOf('.')) + "_sources." + file.getFileExtension()));
+			IFile srcjar = file.getParent().getFile(new Path(file.getName().substring(0, file.getName().lastIndexOf('.')) + "-sources." + file.getFileExtension()));
 			if (srcjar.getFullPath().toFile().exists())
 			{
 				return srcjar.getFullPath();
