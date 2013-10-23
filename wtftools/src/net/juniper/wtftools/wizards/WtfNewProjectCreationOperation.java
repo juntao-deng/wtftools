@@ -82,7 +82,7 @@ public class WtfNewProjectCreationOperation extends WorkspaceModifyOperation
 			String projectPath = project.getLocation().toOSString();
 			String projectLocation = projectPath + "/web/";
 			FileUtils.copyFile(new File(fwLocation + "index.html"), new File(projectLocation + "index.html"));
-			FileUtils.copyFile(new File(fwLocation + "rest/home.js"), new File(projectLocation + "rest/home.js"));
+			FileUtils.copyFile(new File(fwLocation + "rest/homeinfos.js"), new File(projectLocation + "rest/homeinfos.js"));
 			FileUtils.copyFile(new File(fwLocation + "rest/dashboard.js"), new File(projectLocation + "rest/dashboard.js"));
 			FileUtils.copyDirectory(new File(fwLocation + "applications/home"), new File(projectLocation + "applications/home"));
 			FileUtils.copyDirectory(new File(fwLocation + "applications/dashboard"), new File(projectLocation + "applications/dashboard"));
@@ -100,9 +100,9 @@ public class WtfNewProjectCreationOperation extends WorkspaceModifyOperation
 			indexContent = indexContent.replace("#CTX#", projectProvider.getContext());
 			FileUtils.writeStringToFile(new File(projectPath + "index.html"), indexContent);
 			
-			String restContent = FileUtils.readFileToString(new File(projectPath + "rest/home.js"));
+			String restContent = FileUtils.readFileToString(new File(projectPath + "rest/homeinfos.js"));
 			restContent = restContent.replaceAll("#CTX#", projectProvider.getContext());
-			FileUtils.writeStringToFile(new File(projectPath + "rest/home.js"), restContent);
+			FileUtils.writeStringToFile(new File(projectPath + "rest/homeinfos.js"), restContent);
 			
 			
 			String configContent = FileUtils.readFileToString(new File(projectPath + "configuration/context.js"));
