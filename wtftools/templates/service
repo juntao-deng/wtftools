@@ -1,0 +1,14 @@
+package net.juniper.space.services;
+
+#IMPORT_ENTITY#
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+
+public interface #ENTITY_NAME#Service {
+	public Page<#ENTITY_NAME#> get#ENTITY_NAME#s(Specification<#ENTITY_NAME#> spec, Pageable pagination);
+	public #ENTITY_NAME# get#ENTITY_NAME#(Integer id);
+	public void delete#ENTITY_NAME#(Integer id);
+	public #ENTITY_NAME# save#ENTITY_NAME#(#ENTITY_NAME# device);
+	public #ENTITY_NAME# update#ENTITY_NAME#(#ENTITY_NAME# device);
+}

@@ -1,0 +1,9 @@
+package net.juniper.space.dao;
+
+#IMPORT_ENTITY#
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+
+public interface #ENTITY_NAME#Repository extends JpaRepository<#ENTITY_NAME#, Integer>, JpaSpecificationExecutor<#ENTITY_NAME#>{
+
+}

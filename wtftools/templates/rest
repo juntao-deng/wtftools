@@ -1,0 +1,62 @@
+package net.juniper.space.restful;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.PathSegment;
+
+import net.juniper.space.core.locator.ServiceLocator;
+#IMPORT_ENTITY#
+#IMPORT_SERVICE#
+import net.juniper.wtf.core.repository.PageResult;
+import net.juniper.wtf.core.util.ParamHelper;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+
+@Path("/#SERVICE_NAME#")
+public class #ENTITY_NAME#RestService {
+	private #ENTITY_NAME#Service service = ServiceLocator.getService(#ENTITY_NAME#Service.class);
+	
+	@GET 
+	@Path("/ctx/{seg}") 
+	@Produces(MediaType.APPLICATION_JSON)
+	public PageResult<#ENTITY_NAME#> get#ENTITY_NAME#s(@PathParam("seg") PathSegment seg) {
+		Pageable pagination = ParamHelper.extractPageableInfo(seg);
+		Specification<#ENTITY_NAME#> spec = ParamHelper.extractSpecification(seg, #ENTITY_NAME#.class);
+		Page<#ENTITY_NAME#> page = service.get#ENTITY_NAME#s(spec, pagination);
+		return new PageResult<#ENTITY_NAME#>(page);
+	}
+	
+	@GET
+	@Path("/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public #ENTITY_NAME# get#ENTITY_NAME#(@PathParam("id") Integer id){
+		return service.get#ENTITY_NAME#(id);
+	}
+ 
+	@POST
+	@Path("/")
+	@Produces(MediaType.APPLICATION_JSON)
+	public #ENTITY_NAME# update#ENTITY_NAME#(#ENTITY_NAME# device){
+		return service.update#ENTITY_NAME#(device);
+	}
+	
+	@PUT
+	@Path("/")
+	@Produces(MediaType.APPLICATION_JSON)
+	public #ENTITY_NAME# add#ENTITY_NAME#(#ENTITY_NAME# device){
+		return service.save#ENTITY_NAME#(device);
+	}
+ 
+	@PUT
+	@Path("/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public void delete#ENTITY_NAME#(@PathParam("id") Integer id){
+		service.delete#ENTITY_NAME#(id);
+	}
+}
