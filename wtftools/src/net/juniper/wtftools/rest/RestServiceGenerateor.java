@@ -13,7 +13,7 @@ public class RestServiceGenerateor extends AbstractServiceGenerator {
 	@Override
 	protected String replaceFile(String template) {
 		template = template.replace("#IMPORT_SERVICE#", "import net.juniper.space.services." + getEntityName() + "Service;");
-		template = template.replace("#SERVICE_NAME#", getEntityName().toLowerCase());
+		template = template.replace("#SERVICE_NAME#", getEntityName().toLowerCase() + "s");
 		return template;
 	}
 

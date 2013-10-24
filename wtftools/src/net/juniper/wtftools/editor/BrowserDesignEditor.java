@@ -8,6 +8,7 @@ import java.util.Map;
 import net.juniper.wtftools.WtfToolsActivator;
 import net.juniper.wtftools.core.WtfProjectCommonTools;
 import net.juniper.wtftools.designer.BrowserEventHandlerFactory;
+import net.juniper.wtftools.rest.RestGeneratorHelper;
 import net.sf.json.JSONObject;
 
 import org.apache.commons.io.FileUtils;
@@ -94,6 +95,7 @@ public class BrowserDesignEditor extends EditorPart {
 
 	@Override
 	public void createPartControl(Composite parent) {
+		RestGeneratorHelper.generate(null);
 		browser = new Browser(parent, SWT.NONE);
 		browser.setJavascriptEnabled(true);
 		String url = getUrl();
