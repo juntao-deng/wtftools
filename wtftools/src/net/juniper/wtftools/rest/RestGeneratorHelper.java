@@ -29,4 +29,8 @@ public class RestGeneratorHelper {
 			}
 		}
 	}
+	
+	public static boolean restExist(String entityClazz){
+		return new RestServiceGenerateor(entityClazz).exist();
+	}
 }

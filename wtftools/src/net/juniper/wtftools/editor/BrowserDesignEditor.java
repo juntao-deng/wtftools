@@ -3,7 +3,9 @@ package net.juniper.wtftools.editor;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import net.juniper.wtftools.WtfToolsActivator;
 import net.juniper.wtftools.core.WtfProjectCommonTools;
@@ -40,7 +42,7 @@ public class BrowserDesignEditor extends EditorPart {
 	private boolean dirty = false;
 	private Map<String, String> modelMap = new HashMap<String, String>();
 	private Map<String, String> controllerMap = new HashMap<String, String>();
-	private Map<String, JSONObject> restMap = new HashMap<String, JSONObject>();
+	private Set<String> restList = new HashSet<String>();
 	private String htmlContent;
 	
 	public void setDirty(boolean dirty){
@@ -50,9 +52,10 @@ public class BrowserDesignEditor extends EditorPart {
 	
 	@Override
 	public void doSave(IProgressMonitor monitor) {
-		ApplicationUpdateHelper.update(appPath, restPath, htmlPath, modelMap, controllerMap, htmlContent);
+		ApplicationUpdateHelper.update(appPath, restPath, htmlPath, modelMap, controllerMap, restList, htmlContent);
 		modelMap.clear();
 		controllerMap.clear();
+		restList.clear();
 		htmlContent = null;
 		setDirty(false);
 		try {
@@ -184,7 +187,8 @@ public class BrowserDesignEditor extends EditorPart {
 		this.controllerMap.put(key, controller);
 	}
 	
-	public void addRest(String file, JSONObject api){
-		this.restMap.put(file, api);
+	public void addRest(String rest){
+		if(rest != null)
+			this.restList.add(rest);
 	}
 }

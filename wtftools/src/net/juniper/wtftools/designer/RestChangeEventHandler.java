@@ -7,8 +7,8 @@ public class RestChangeEventHandler extends AbstractBrowserEventHandler {
 
 	@Override
 	public JSONObject handle(BrowserDesignEditor editor, JSONObject json) {
-		editor.addRest((String)json.getString("file"), (JSONObject)json.get("api"));
-		editor.setDirty(true);
+//		editor.addRest((String)json.getString("file"), (JSONObject)json.get("api"));
+//		editor.setDirty(true);
 		return null;
 	}
 

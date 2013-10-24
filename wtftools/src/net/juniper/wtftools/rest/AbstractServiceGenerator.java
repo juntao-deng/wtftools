@@ -27,6 +27,12 @@ public abstract class AbstractServiceGenerator implements ServiceGenerator {
 		path = WtfProjectCommonTools.getCurrentWtfProject().getLocation().toOSString() + "/" + getSourcePath() + "/" + path;
 		writeToSystem(template, path);
 	}
+	
+	public boolean exist() {
+		String path = getTargetPath();
+		path = WtfProjectCommonTools.getCurrentWtfProject().getLocation().toOSString() + "/" + getSourcePath() + "/" + path;
+		return new File(path).exists();
+	}
 
 	private String doReplace(String template) {
 		template = replaceEntityImport(template);

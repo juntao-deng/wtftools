@@ -10,6 +10,7 @@ import javax.xml.bind.annotation.XmlType;
 import net.juniper.wtftools.WtfToolsActivator;
 import net.juniper.wtftools.core.WtfProjectCommonTools;
 import net.juniper.wtftools.editor.BrowserDesignEditor;
+import net.juniper.wtftools.rest.RestGeneratorHelper;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -105,6 +106,9 @@ public class EjbParserEventHandler extends AbstractBrowserEventHandler{
 			JSONObject result = new JSONObject();
 			JSONArray columnInfos = getColumnInfos(c);
 			result.put("columnInfos", columnInfos); 
+			if(!RestGeneratorHelper.restExist(className)){
+				result.put("generateClass", className);
+			}
 			return result;
 		}
 		catch(EventHandlerException e){
