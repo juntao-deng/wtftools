@@ -86,6 +86,7 @@ public class EjbParserEventHandler extends AbstractBrowserEventHandler{
 			json.put("text", cName);
 			json.put("visible", true);
 			json.put("sortable", true);
+			json.put("width", "90");
 			return json;
 		} 
 		catch (Exception e) {
@@ -109,6 +110,7 @@ public class EjbParserEventHandler extends AbstractBrowserEventHandler{
 			if(!RestGeneratorHelper.restExist(className)){
 				result.put("generateClass", className);
 			}
+			result.put("restservice", className.substring(className.lastIndexOf(".") + 1).toLowerCase());
 			return result;
 		}
 		catch(EventHandlerException e){

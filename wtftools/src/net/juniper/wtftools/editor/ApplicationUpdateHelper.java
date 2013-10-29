@@ -9,6 +9,7 @@ import java.util.Set;
 
 import net.juniper.wtftools.WtfToolsActivator;
 import net.juniper.wtftools.rest.RestGeneratorHelper;
+import net.sf.json.JSONObject;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.core.runtime.IPath;
@@ -127,7 +128,7 @@ public class ApplicationUpdateHelper {
 //		if(node instanceof Div && ((Div)node).getAttribute("wtftype") != null && ((Div)node).getAttribute("wtftype").equals("container")){
 //			node.getParent().setChildren(cList);
 //		}
-		if(node instanceof Div && ((Div)node).getAttribute("wtftype") != null && ((Div)node).getAttribute("wtftype").equals("template")){
+		if(node instanceof Div && ((Div)node).getAttribute("wtftype") != null && (!((Div)node).getAttribute("wtftype").equals("container"))){
 			node.setChildren(null);
 			cList = null;
 		}
@@ -135,6 +136,15 @@ public class ApplicationUpdateHelper {
 		if(node instanceof Div){
 			((Div) node).removeAttribute("wtfdone");
 			((Div) node).removeAttribute("designable");
+			String className = ((Div) node).getAttribute("class");
+			if(className != null && className.contains(" designele_sign")){
+				className = className.replace(" designele_sign", "");
+			}
+			if(className != null && className.contains(" designele")){
+				className = className.replace(" designele", "");
+			}
+			if(className != null)
+				((Div) node).setAttribute("class", className);
 		}
 		if(cList != null){
 			SimpleNodeIterator it = cList.elements();
@@ -158,7 +168,7 @@ public class ApplicationUpdateHelper {
 			int start = modelStr.indexOf(getStartString(id, sign));
 			if(start == -1){
 				String value = entry.getValue();
-				if(value == null || value.equals(""))
+				if(value == null || value.equals("") || value.equals("null"))
 					return modelStr;
 				modelStr = addToString(id, modelStr, value, sign);
 			}
@@ -186,11 +196,11 @@ public class ApplicationUpdateHelper {
 	}
 	
 	private static String getStartString(String id, String type) {
-		return "/*======" + type + ":" + id + "======starts here,for designer,don't modify this line*/";
+		return "/*\n* definition of" + type + ":" + id + "\n*/";
 	}
 
 	private static String getEndString() {
-		return "/*======for designer,don't modify this line*/";
+		return "/*\n* definition end\n*/";
 	}
 	
 	private static void updateFile(String path, String str) {
@@ -218,8 +228,13 @@ public class ApplicationUpdateHelper {
 
 	private static String generateCodes(String id, String metadata, String sign) {
 		if(sign.equals("metadata")){
-			String str = TAB + "var metadata_" + id + " = " + metadata + ";" + BR;
-			return str + TAB + BR + "$app.metadata('" + id + "', metadata_" + id + ");";
+			JSONObject obj = JSONObject.fromObject(metadata);
+			String modelId = (String) obj.get("model");
+			String url = modelId.substring(0, modelId.lastIndexOf("_model")) + "s";
+			String serviceUrl = url;
+			String str = "$app.model('" + modelId + "', {url:'" + serviceUrl + "'});\n";
+//			str += "var metadata_" + id + " = " + metadata + ";" + BR;
+			return str + "$app.metadata('" + id + "', " + metadata + ");";
 		}
 		else{
 			return TAB + metadata;

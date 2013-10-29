@@ -11,7 +11,6 @@ import org.eclipse.swt.widgets.Display;
 
 public class RestGeneratorHelper {
 	public static void generate(String entityClazz){
-		entityClazz = "net.juniper.space.models.device.Device";
 		List<ServiceGenerator> list = new ArrayList<ServiceGenerator>();
 		list.add(new DaoServiceGenerator(entityClazz));
 		list.add(new LogicServiceGenerator(entityClazz));

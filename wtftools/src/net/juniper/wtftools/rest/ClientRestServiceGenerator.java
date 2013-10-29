@@ -8,22 +8,27 @@ public class ClientRestServiceGenerator extends AbstractServiceGenerator {
 
 	@Override
 	protected String getTargetPath() {
-		return null;
+		return "rest/" + getTargetClassName() + ".js";
+	}
+
+	private String getTargetClassName() {
+		return getEntityName().toLowerCase() + "s";
 	}
 
 	@Override
 	protected String replaceFile(String template) {
-		return null;
+		template = template.replace("#SERVICE_NAME#", getEntityName().toLowerCase() + "s");
+		return template;
 	}
 
 	@Override
 	protected String getTemplatePath() {
-		return null;
+		return "restjs";
 	}
 
 	@Override
 	protected String getSourcePath() {
-		return null;
+		return "web";
 	}
 
 }
