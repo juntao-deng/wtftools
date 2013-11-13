@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import net.juniper.wtftools.WtfToolsActivator;
+import net.juniper.wtftools.designer.utils.JsonFormatTool;
 import net.juniper.wtftools.rest.RestGeneratorHelper;
 import net.sf.json.JSONObject;
 
@@ -234,10 +235,10 @@ public class ApplicationUpdateHelper {
 			String serviceUrl = url;
 			String str = "$app.model('" + modelId + "', {url:'" + serviceUrl + "'});\n";
 //			str += "var metadata_" + id + " = " + metadata + ";" + BR;
-			return str + "$app.metadata('" + id + "', " + metadata + ");";
+			return str + "$app.metadata('" + id + "', " + JsonFormatTool.formatJson(metadata, "\t") + "\n);";
 		}
 		else{
-			return TAB + metadata;
+			return TAB + JsonFormatTool.formatJson(metadata, "\t");
 		}
 	}
 }

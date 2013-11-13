@@ -81,9 +81,9 @@ public class WtfApplicationNewWizard extends Wizard implements INewWizard {
 		try {
 			IFile file = WtfProjectCommonTools.getCurrentProject().getFile("web/applications/" + appId + "/" + leafId + ".html");
 			IEditorInput input = new FileEditorInput(file);
+			WtfProjectCommonTools.getCurrentProject().refreshLocal(IProject.DEPTH_INFINITE, null);
 			
 			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(input, "net.juniper.wtftools.editor.BrowserDesignEditor");
-			WtfProjectCommonTools.getCurrentProject().refreshLocal(IProject.DEPTH_INFINITE, null);
 		} 
 		catch (Exception e) {
 			WtfToolsActivator.getDefault().logError(e);
