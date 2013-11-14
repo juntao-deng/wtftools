@@ -45,7 +45,6 @@ public class BrowserDesignEditor extends EditorPart {
 	private boolean dirty = false;
 	private Map<String, String> modelMap = new HashMap<String, String>();
 	private Map<String, String> controllerMap = new HashMap<String, String>();
-	private Set<String> restList = new HashSet<String>();
 	private String htmlContent;
 	private TextEditor htmlEditor;
 	private TextEditor controllerEditor;
@@ -61,15 +60,14 @@ public class BrowserDesignEditor extends EditorPart {
 	@Override
 	public void doSave(IProgressMonitor monitor) {
 		ApplicationUpdateHelper.update(appPath, restPath, htmlPath, modelMap,
-				controllerMap, restList, htmlContent);
+				controllerMap, htmlContent);
 		modelMap.clear();
 		controllerMap.clear();
-		restList.clear();
 		htmlContent = null;
 		setDirty(false);
-		 htmlEditor.doSave();
-		 controllerEditor.doSave();
-		 modelEditor.doSave();
+		htmlEditor.doSave();
+		controllerEditor.doSave();
+		modelEditor.doSave();
 		try {
 			WtfProjectCommonTools.getCurrentProject().refreshLocal(
 					IProject.DEPTH_INFINITE, null);
@@ -269,11 +267,6 @@ public class BrowserDesignEditor extends EditorPart {
 
 	public void addController(String key, String controller) {
 		this.controllerMap.put(key, controller);
-	}
-
-	public void addRest(String rest) {
-		if (rest != null)
-			this.restList.add(rest);
 	}
 
 	@Override

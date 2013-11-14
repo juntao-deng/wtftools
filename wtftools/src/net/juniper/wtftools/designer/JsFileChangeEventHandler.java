@@ -10,10 +10,6 @@ public class JsFileChangeEventHandler extends AbstractBrowserEventHandler {
 		editor.addModel(json.getString("compId"), json.getString("metadata"));
 		editor.addController(json.getString("compId"), json.getString("controller"));
 		JSONObject restObj = (JSONObject) json.get("rest");
-		if(restObj != null){
-			if(restObj.has("generateClass"))
-				editor.addRest(restObj.getString("generateClass"));
-		}
 		editor.setDirty(true);
 		return null;
 	}

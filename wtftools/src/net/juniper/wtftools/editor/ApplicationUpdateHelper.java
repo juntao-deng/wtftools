@@ -5,11 +5,9 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import net.juniper.wtftools.WtfToolsActivator;
 import net.juniper.wtftools.designer.utils.JsonFormatTool;
-import net.juniper.wtftools.rest.RestGeneratorHelper;
 import net.sf.json.JSONObject;
 
 import org.apache.commons.io.FileUtils;
@@ -30,7 +28,7 @@ public class ApplicationUpdateHelper {
 
 
 
-	public static void update(IPath appPath, IPath restPath, IPath htmlPath, Map<String, String> metadataMap, Map<String, String> controllerMap, Set<String> restList, String htmlContent){
+	public static void update(IPath appPath, IPath restPath, IPath htmlPath, Map<String, String> metadataMap, Map<String, String> controllerMap, String htmlContent){
 		String metadataPath = appPath.append("model.js").toOSString();
 		String modelStr = getFile(metadataPath);
 		if(modelStr == null || modelStr.trim().equals(""))
@@ -47,13 +45,6 @@ public class ApplicationUpdateHelper {
 		
 		htmlContent = fixHtml(htmlContent);
 		updateFile(htmlPath.toOSString(), htmlContent);
-		
-		if(restList.size() > 0){
-			Iterator<String> it = restList.iterator();
-			while(it.hasNext()){
-				RestGeneratorHelper.generate(it.next());
-			}
-		}
 	}
 
 

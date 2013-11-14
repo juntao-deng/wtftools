@@ -18,7 +18,7 @@ public abstract class AbstractServiceGenerator implements ServiceGenerator {
 	}
 	
 	@Override
-	public void run() throws IOException {
+	public String run() throws IOException {
 		String tPath = getTemplatePath();
 		tPath = WtfProjectCommonTools.getFrameworkWebLocation() + "/init/backend/" + tPath;
 		String template = readTemplateFile(tPath);
@@ -26,6 +26,7 @@ public abstract class AbstractServiceGenerator implements ServiceGenerator {
 		String path = getTargetPath();
 		path = WtfProjectCommonTools.getCurrentWtfProject().getLocation().toOSString() + "/" + getSourcePath() + "/" + path;
 		writeToSystem(template, path);
+		return path;
 	}
 	
 	public boolean exist() {

@@ -10,7 +10,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 
 public class RestGeneratorHelper {
-	public static void generate(String entityClazz){
+	public static List<String> generate(String entityClazz){
 		List<ServiceGenerator> list = new ArrayList<ServiceGenerator>();
 		list.add(new DaoServiceGenerator(entityClazz));
 		list.add(new LogicServiceGenerator(entityClazz));
@@ -18,15 +18,18 @@ public class RestGeneratorHelper {
 		list.add(new LogicServiceGenerator(entityClazz));
 		list.add(new LogicServiceImplGenerator(entityClazz));
 		list.add(new ClientRestServiceGenerator(entityClazz));
+		
+		List<String> generatedClass = new ArrayList<String>();
 		for(ServiceGenerator generator : list){
 			try{
-				generator.run();
+				generatedClass.add(generator.run());
 			}
 			catch(IOException e){
 				WtfToolsActivator.getDefault().logError(e);
 				MessageDialog.openError(Display.getDefault().getActiveShell(), "Error", e.getMessage());
 			}
 		}
+		return generatedClass;
 	}
 	
 	public static boolean restExist(String entityClazz){

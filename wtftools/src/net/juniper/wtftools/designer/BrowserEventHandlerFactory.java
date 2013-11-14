@@ -9,11 +9,12 @@ import net.sf.json.JSONObject;
 public class BrowserEventHandlerFactory {
 	public static List<IBrowserEventHandler> handlers = new ArrayList<IBrowserEventHandler>();
 	static{
-		handlers.add(new EjbParserEventHandler());
+		handlers.add(new EntitySelectionEventHandler());
 		handlers.add(new HtmlFileChangeEventHandler());
 		handlers.add(new JsFileChangeEventHandler());
 		handlers.add(new RestChangeEventHandler());
 		handlers.add(new UpdateStateEventHandler());
+		handlers.add(new GenerateCodeEventHandler());
 	}
 	
 	public static JSONObject handleEvent(BrowserDesignEditor editor, String str){
