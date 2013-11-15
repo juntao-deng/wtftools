@@ -17,6 +17,20 @@ public abstract class AbstractServiceGenerator implements ServiceGenerator {
 		return entityPath.substring(entityPath.lastIndexOf(".") + 1);
 	}
 	
+	protected String getMOName(){
+		return getSimpleName() + "MO";
+	}
+	
+	protected String getSimpleName(){
+		String entityName = getEntityName();
+		if(entityName.endsWith("Entity"))
+			entityName = entityName.substring(0, "Entity".length());
+		return entityName;
+	}
+	protected String getMOPath() {
+		return "net.juniper.space.models." + getSimpleName().toLowerCase() + "." + getMOName();
+	}
+	
 	@Override
 	public String run() throws IOException {
 		String tPath = getTemplatePath();
@@ -37,7 +51,10 @@ public abstract class AbstractServiceGenerator implements ServiceGenerator {
 
 	private String doReplace(String template) {
 		template = replaceEntityImport(template);
+		template = replaceMOImport(template);
 		template = replaceEntityName(template);
+		template = replaceMOName(template);
+		template = replaceSimpleName(template);
 		return replaceFile(template);
 	}
 	private void writeToSystem(String template, String path) throws IOException {
@@ -58,9 +75,20 @@ public abstract class AbstractServiceGenerator implements ServiceGenerator {
 		return template.replaceAll("#IMPORT_ENTITY#", "import " + this.entityPath + ";");
 	}
 	
+	protected String replaceMOImport(String template){
+		return template.replaceAll("#IMPORT_MO#", "import " + this.getMOPath() + ";");
+	}
+	
 	protected String replaceEntityName(String template){
 		return template.replaceAll("#ENTITY_NAME#", getEntityName());
 	}
+	protected String replaceMOName(String template){
+		return template.replaceAll("#MO_NAME#", getMOName());
+	}
+	protected String replaceSimpleName(String template){
+		return template.replaceAll("#ENTITY_SIMPLENAME#", getSimpleName());
+	}
+	
 	
 	protected abstract String getSourcePath();
 }

@@ -12,13 +12,13 @@ public class LogicServiceImplGenerator extends AbstractServiceGenerator{
 	}
 
 	private String getTargetClassName() {
-		return getEntityName() + "ServiceImpl";
+		return getSimpleName() + "ServiceImpl";
 	}
 
 	@Override
 	protected String replaceFile(String template) {
-		template = template.replace("#IMPORT_SERVICE#", "import net.juniper.space.services." + getEntityName() + "Service;");
-		template = template.replace("#SERVICE_PATH#", "net.juniper.space.services." + getEntityName() + "Service");
+		template = template.replace("#IMPORT_SERVICE#", "import net.juniper.space.services." + getSimpleName() + "Service;");
+		template = template.replace("#SERVICE_PATH#", "net.juniper.space.services." + getSimpleName() + "Service");
 		template = template.replace("#IMPORT_REPOSITORY#", "import net.juniper.space.dao." + getEntityName() + "Repository;");
 		return template;
 	}

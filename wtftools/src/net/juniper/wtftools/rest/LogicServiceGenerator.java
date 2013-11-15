@@ -12,7 +12,7 @@ public class LogicServiceGenerator extends AbstractServiceGenerator{
 	}
 
 	private String getTargetClassName() {
-		return getEntityName() + "Service";
+		return getSimpleName() + "Service";
 	}
 
 	@Override

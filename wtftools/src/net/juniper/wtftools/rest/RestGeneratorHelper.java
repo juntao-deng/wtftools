@@ -12,8 +12,10 @@ import org.eclipse.swt.widgets.Display;
 public class RestGeneratorHelper {
 	public static List<String> generate(String entityClazz){
 		List<ServiceGenerator> list = new ArrayList<ServiceGenerator>();
+		list.add(new MoGenerator(entityClazz));
 		list.add(new DaoServiceGenerator(entityClazz));
 		list.add(new LogicServiceGenerator(entityClazz));
+		list.add(new RestItfServiceGenerateor(entityClazz));
 		list.add(new RestServiceGenerateor(entityClazz));
 		list.add(new LogicServiceGenerator(entityClazz));
 		list.add(new LogicServiceImplGenerator(entityClazz));
