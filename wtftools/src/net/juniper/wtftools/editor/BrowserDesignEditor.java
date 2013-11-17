@@ -3,13 +3,14 @@ package net.juniper.wtftools.editor;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import net.juniper.wtftools.WtfToolsActivator;
 import net.juniper.wtftools.core.WtfProjectCommonTools;
 import net.juniper.wtftools.designer.BrowserEventHandlerFactory;
+import net.juniper.wtftools.designer.utils.JsEventDesc;
+import net.juniper.wtftools.designer.utils.JsEventFileParser;
 import net.sf.json.JSONObject;
 
 import org.apache.commons.io.FileUtils;
@@ -49,6 +50,7 @@ public class BrowserDesignEditor extends EditorPart {
 	private TextEditor htmlEditor;
 	private TextEditor controllerEditor;
 	private TextEditor modelEditor;
+	private List<JsEventDesc> existingEvents; 
 
 	public void setDirty(boolean dirty) {
 		if (this.dirty == dirty)
@@ -64,6 +66,7 @@ public class BrowserDesignEditor extends EditorPart {
 		modelMap.clear();
 		controllerMap.clear();
 		htmlContent = null;
+		existingEvents = null;
 		setDirty(false);
 		htmlEditor.doSave();
 		controllerEditor.doSave();
@@ -95,6 +98,7 @@ public class BrowserDesignEditor extends EditorPart {
 			restPath = restPath.removeLastSegments(1);
 		}
 		restPath = restPath.removeLastSegments(1).append("rest");
+		existingEvents = new JsEventFileParser().getEvents(appPath.append("controller.js").toFile());
 	}
 
 	private void startDirtyMonitor() {
@@ -275,6 +279,14 @@ public class BrowserDesignEditor extends EditorPart {
 		controllerEditor.clearChanged();
 		modelEditor.clearChanged();
 		super.dispose();
+	}
+
+	public List<JsEventDesc> getExistingEvents() {
+		return existingEvents;
+	}
+
+	public void setExistingEvents(List<JsEventDesc> existingEvents) {
+		this.existingEvents = existingEvents;
 	}
 
 }

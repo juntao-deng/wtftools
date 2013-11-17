@@ -8,7 +8,7 @@ import net.juniper.wtftools.core.WtfProjectCommonTools;
 import org.apache.commons.io.FileUtils;
 
 public abstract class AbstractServiceGenerator implements ServiceGenerator {
-	private String entityPath;
+	protected String entityPath;
 	
 	public AbstractServiceGenerator(String entityPath){
 		this.entityPath = entityPath;
@@ -48,7 +48,7 @@ public abstract class AbstractServiceGenerator implements ServiceGenerator {
 		path = WtfProjectCommonTools.getCurrentWtfProject().getLocation().toOSString() + "/" + getSourcePath() + "/" + path;
 		return new File(path).exists();
 	}
-
+	
 	private String doReplace(String template) {
 		template = replaceEntityImport(template);
 		template = replaceMOImport(template);
@@ -58,6 +58,10 @@ public abstract class AbstractServiceGenerator implements ServiceGenerator {
 		return replaceFile(template);
 	}
 	private void writeToSystem(String template, String path) throws IOException {
+		File f = new File(path);
+		if(f.exists()){
+			f.delete();
+		}
 		FileUtils.writeStringToFile(new File(path), template);
 	}
 

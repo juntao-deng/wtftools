@@ -30,6 +30,14 @@ public class EntitySelectionEventHandler extends AbstractBrowserEventHandler{
 		if(!RestGeneratorHelper.restExist(className)){
 			result.put("restapiExist", true);
 		}
+		
+		String serviceName = null;
+		if(className.endsWith("Entity"))
+			serviceName = className.substring(0, className.length() - "Entity".length()).toLowerCase() + "s";
+		else
+			serviceName = className.toLowerCase() + "s";
+		result.put("serviceName", serviceName);
+		result.put("modelId", serviceName + "Model");
 //			WtfToolsActivator.getDefault().logInfo("=== parsing class:" + className);
 //			Class c = Class.forName(className, true, WtfProjectCommonTools.getCurrentProjectClassLoader());
 //			JSONArray columnInfos = getColumnInfos(c);
