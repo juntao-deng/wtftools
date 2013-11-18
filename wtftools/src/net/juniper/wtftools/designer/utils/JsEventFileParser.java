@@ -10,12 +10,12 @@ import net.juniper.wtftools.WtfToolsActivator;
 import org.apache.commons.io.FileUtils;
 
 public class JsEventFileParser {
-	private static final String GLOBAL = "GLOBAL";
-	private String GLOBALBEGIN = "/** Global scope begin*/";
-	private String GLOBALEND = "/** Global scope end*/";
-	private String EVENTBEGIN = "/** Events scope begin*/";
-	private String EVENTEND = "/** Events scope end*/";
-	String eventSign = "@Event";
+	public static final String GLOBAL = "GLOBAL";
+	public static final String GLOBALBEGIN = "/** Global scope begin*/";
+	public static final String GLOBALEND = "/** Global scope end*/";
+	public static final String EVENTBEGIN = "/** Events scope begin*/";
+	public static final String EVENTEND = "/** Events scope end*/";
+//	String eventSign = "@Event";
 	
 	public List<JsEventDesc> getEvents(File file){
 		List<JsEventDesc> eventList = new ArrayList<JsEventDesc>();
@@ -43,6 +43,7 @@ public class JsEventFileParser {
 
 	private void parseEvents(List<JsEventDesc> eventList, String eventStr) {
 		int begin = 0;
+		String eventSign = ".on('";
 		int index = eventStr.indexOf(eventSign, begin);
 		while(index != -1){
 			String eventName = extractEventName(eventStr, begin);
@@ -71,7 +72,7 @@ public class JsEventFileParser {
 			return "";
 		index = eventStr.indexOf("{");
 		int lindex = eventStr.indexOf("});", index);
-		return eventStr.substring(index + 1, lindex);
+		return eventStr.substring(index + 2, lindex - 1);
 	}
 
 	private String extractCompId(String eventStr, int begin) {
@@ -108,7 +109,7 @@ public class JsEventFileParser {
 			if(eindex == -1)
 				return null;
 			JsEventDesc desc = new JsEventDesc();
-			desc.setCompId("");
+			desc.setCompId(GLOBAL);
 			desc.setName(GLOBAL);
 			desc.setFunc(fileStr.substring(bindex + GLOBALBEGIN.length(), eindex));
 			return desc;

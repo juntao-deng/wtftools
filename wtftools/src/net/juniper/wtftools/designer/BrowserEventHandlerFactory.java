@@ -11,10 +11,12 @@ public class BrowserEventHandlerFactory {
 	static{
 		handlers.add(new EntitySelectionEventHandler());
 		handlers.add(new HtmlFileChangeEventHandler());
-		handlers.add(new JsFileChangeEventHandler());
+//		handlers.add(new JsFileChangeEventHandler());
 		handlers.add(new RestChangeEventHandler());
 		handlers.add(new UpdateStateEventHandler());
 		handlers.add(new GenerateCodeEventHandler());
+		handlers.add(new GetEventMethodsHandler());
+		handlers.add(new UpdateControllerEventHandler());
 	}
 	
 	public static JSONObject handleEvent(BrowserDesignEditor editor, String str){

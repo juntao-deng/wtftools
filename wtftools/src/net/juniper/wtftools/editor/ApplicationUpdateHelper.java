@@ -3,11 +3,15 @@ package net.juniper.wtftools.editor;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import net.juniper.wtftools.WtfToolsActivator;
+import net.juniper.wtftools.designer.utils.JsEventDesc;
+import net.juniper.wtftools.designer.utils.JsEventFileParser;
 import net.juniper.wtftools.designer.utils.JsonFormatTool;
+import net.juniper.wtftools.designer.utils.WtfStringUtils;
 import net.sf.json.JSONObject;
 
 import org.apache.commons.io.FileUtils;
@@ -23,30 +27,103 @@ import org.htmlparser.util.ParserException;
 import org.htmlparser.util.SimpleNodeIterator;
 
 public class ApplicationUpdateHelper {
-	private static final String BR = "\r\n";
+	private static final String BR = "\n";
 	private static final String TAB = "\t";
 
 
 
-	public static void update(IPath appPath, IPath restPath, IPath htmlPath, Map<String, String> metadataMap, Map<String, String> controllerMap, String htmlContent){
+	public static void update(IPath appPath, IPath restPath, IPath htmlPath, Map<String, String> metadataMap, String htmlContent){
 		String metadataPath = appPath.append("model.js").toOSString();
 		String modelStr = getFile(metadataPath);
 		if(modelStr == null || modelStr.trim().equals(""))
-			modelStr = "wdefine(function(){\r\n});";
+			modelStr = "wdefine(function(){\n});";
 		modelStr = updateCode(modelStr, metadataMap, "metadata");
 		updateFile(metadataPath, modelStr);
 		
-		String controllerPath = appPath.append("controller.js").toOSString();
-		String controllerStr = getFile(controllerPath);
-		if(controllerStr == null || controllerStr.trim().equals(""))
-			controllerStr = "wdefine(function(){\r\n});";
-		controllerStr = updateCode(controllerStr, controllerMap, "controller");
-		updateFile(controllerPath, controllerStr);
+//		String controllerPath = appPath.append("controller.js").toOSString();
+//		String controllerStr = getFile(controllerPath);
+//		if(controllerStr == null || controllerStr.trim().equals(""))
+//			controllerStr = "wdefine(function(){\r\n});";
+//		controllerStr = updateCode(controllerStr, controllerMap, "controller");
+//		updateFile(controllerPath, controllerStr);
 		
 		htmlContent = fixHtml(htmlContent);
 		updateFile(htmlPath.toOSString(), htmlContent);
 	}
-
+	
+	public static void updateController(IPath controllerPath, List<JsEventDesc> eventList){
+		try {
+			String controllerStr = FileUtils.readFileToString(controllerPath.toFile());
+			int index = controllerStr.indexOf(JsEventFileParser.GLOBALBEGIN);
+			int endIndex = -1;
+			if(index == -1){
+				String modelStr = "wdefine(function(){\n";
+				index = controllerStr.indexOf(modelStr) + modelStr.length();
+			}
+			else{
+				endIndex = controllerStr.indexOf(JsEventFileParser.GLOBALEND) + JsEventFileParser.GLOBALEND.length();
+			}
+			
+			String content = JsEventFileParser.GLOBALBEGIN + "\n\n" + getGlobalMethodContent(eventList) + "\n\n" + JsEventFileParser.GLOBALEND + "\n\n";
+			controllerStr = WtfStringUtils.replaceString(index, endIndex, controllerStr, content);
+//			String beginStr = controllerStr.substring(0, index);
+//			String endStr = null;
+//			int lIndex = controllerStr.indexOf(JsEventFileParser.GLOBALEND);
+//			if(lIndex == -1){
+//				endStr = controllerStr.substring(index);
+//			}
+//			else
+//				endStr = controllerStr.substring(lIndex + JsEventFileParser.GLOBALEND.length());
+//			String fileStr = beginStr + content + endStr;
+			
+			Iterator<JsEventDesc> it = eventList.iterator();
+			while(it.hasNext()){
+				JsEventDesc desc = it.next();
+				if(desc.getName().equals(JsEventFileParser.GLOBAL))
+					continue;
+				controllerStr = updateEventController(controllerStr, desc.getCompId(), desc.getName(), desc.getFunc());
+			}
+			FileUtils.writeStringToFile(controllerPath.toFile(), controllerStr);
+		} 
+		catch (IOException e) {
+			WtfToolsActivator.getDefault().logError(e);
+		}
+	}
+	
+	private static String updateEventController(String controllerStr, String compId, String eventName, String content) {
+		int index = controllerStr.indexOf(JsEventFileParser.EVENTBEGIN);
+		if(index == -1){
+			int gindex = controllerStr.indexOf(JsEventFileParser.GLOBALEND) + JsEventFileParser.GLOBALEND.length();
+			controllerStr = WtfStringUtils.replaceString(gindex, -1, controllerStr, JsEventFileParser.EVENTBEGIN + "\n" + JsEventFileParser.EVENTEND + "\n");
+		}
+		
+		index = controllerStr.indexOf(JsEventFileParser.EVENTBEGIN) + JsEventFileParser.EVENTBEGIN.length() + 1;
+		String str = "$app.component('" + compId + "').on('" + eventName + "'";
+		
+		int eventIndex = controllerStr.indexOf(str);
+		int eventEndIndex = -1;
+		if(eventIndex == -1){
+			eventIndex = index;
+		}
+		else{
+			eventEndIndex = controllerStr.indexOf("});", eventIndex) + "});".length();
+		}
+		
+		String eventStr = str + ", function(options){\n" + content + "\n});\n";
+		return WtfStringUtils.replaceString(eventIndex, eventEndIndex, controllerStr, eventStr);
+//		return bstr + "\n" + eventStr + estr;
+	}
+	
+	private static String getGlobalMethodContent(List<JsEventDesc> eventList) {
+		Iterator<JsEventDesc> it = eventList.iterator();
+		while(it.hasNext()){
+			JsEventDesc desc = it.next();
+			if(desc.getName().equals(JsEventFileParser.GLOBAL)){
+				return desc.getFunc();
+			}
+		}
+		return "";
+	}
 
 
 	private static String fixHtml(String htmlContent) {

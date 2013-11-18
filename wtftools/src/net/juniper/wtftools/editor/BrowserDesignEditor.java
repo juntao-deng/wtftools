@@ -3,6 +3,7 @@ package net.juniper.wtftools.editor;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -45,7 +46,7 @@ public class BrowserDesignEditor extends EditorPart {
 	private String appId;
 	private boolean dirty = false;
 	private Map<String, String> modelMap = new HashMap<String, String>();
-	private Map<String, String> controllerMap = new HashMap<String, String>();
+//	private Map<String, String> controllerMap = new HashMap<String, String>();
 	private String htmlContent;
 	private TextEditor htmlEditor;
 	private TextEditor controllerEditor;
@@ -61,10 +62,9 @@ public class BrowserDesignEditor extends EditorPart {
 
 	@Override
 	public void doSave(IProgressMonitor monitor) {
-		ApplicationUpdateHelper.update(appPath, restPath, htmlPath, modelMap,
-				controllerMap, htmlContent);
+		ApplicationUpdateHelper.update(appPath, restPath, htmlPath, modelMap, htmlContent);
+		ApplicationUpdateHelper.updateController(appPath.append("controller.js"), existingEvents);
 		modelMap.clear();
-		controllerMap.clear();
 		htmlContent = null;
 		existingEvents = null;
 		setDirty(false);
@@ -99,6 +99,13 @@ public class BrowserDesignEditor extends EditorPart {
 		}
 		restPath = restPath.removeLastSegments(1).append("rest");
 		existingEvents = new JsEventFileParser().getEvents(appPath.append("controller.js").toFile());
+		
+		try {
+			htmlContent = FileUtils.readFileToString(htmlPath.toFile());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	private void startDirtyMonitor() {
@@ -269,8 +276,23 @@ public class BrowserDesignEditor extends EditorPart {
 		this.modelMap.put(key, metadata);
 	}
 
-	public void addController(String key, String controller) {
-		this.controllerMap.put(key, controller);
+	public void addController(String id, String name, String funcContent) {
+		Iterator<JsEventDesc> it = existingEvents.iterator();
+		JsEventDesc eventDesc = null;
+		while(it.hasNext()){
+			JsEventDesc desc = it.next();
+			if(desc.getName().equals(name) && desc.getCompId().equals(id)){
+				eventDesc = desc;
+				break;
+			}
+		}
+		if(eventDesc == null){
+			eventDesc = new JsEventDesc();
+			eventDesc.setName(name);
+			eventDesc.setCompId(id);
+			existingEvents.add(eventDesc);
+		}
+		eventDesc.setFunc(funcContent);
 	}
 
 	@Override
