@@ -34,11 +34,17 @@ public class EntitySelectionEventHandler extends AbstractBrowserEventHandler{
 		String simpleName = className.substring(className.lastIndexOf(".") + 1);
 		
 		String serviceName = null;
-		if(simpleName.endsWith("Entity"))
-			serviceName = simpleName.substring(0, simpleName.length() - "Entity".length()).toLowerCase() + "s";
-		else
+		String name = null;
+		if(simpleName.endsWith("Entity")){
+			name = simpleName.substring(0, simpleName.length() - "Entity".length());
+			serviceName = name.toLowerCase() + "s";
+		}
+		else{
+			name = simpleName;
 			serviceName = simpleName.toLowerCase() + "s";
+		}
 		result.put("serviceName", serviceName);
+		result.put("moName", "net.juniper.space.models." + name + "MO");
 		result.put("modelId", serviceName + "Model");
 //			WtfToolsActivator.getDefault().logInfo("=== parsing class:" + className);
 //			Class c = Class.forName(className, true, WtfProjectCommonTools.getCurrentProjectClassLoader());
