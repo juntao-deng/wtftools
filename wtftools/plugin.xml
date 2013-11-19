@@ -215,6 +215,9 @@
             filenames="*.html"
             id="net.juniper.wtftools.editor.BrowserDesignEditor"
             name="Design Editor">
+         <contentTypeBinding
+               contentTypeId="org.eclipse.wst.html.core.htmlsource">
+         </contentTypeBinding>
       </editor>
    </extension>
    <extension

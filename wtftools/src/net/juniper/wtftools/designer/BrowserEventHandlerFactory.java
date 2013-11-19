@@ -17,6 +17,9 @@ public class BrowserEventHandlerFactory {
 		handlers.add(new GenerateCodeEventHandler());
 		handlers.add(new GetEventMethodsHandler());
 		handlers.add(new UpdateControllerEventHandler());
+		handlers.add(new UpdateMetadataEventHandler());
+		handlers.add(new UpdateModelEventHandler());
+		handlers.add(new ClearEventsEventHandler());
 	}
 	
 	public static JSONObject handleEvent(BrowserDesignEditor editor, String str){

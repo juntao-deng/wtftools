@@ -111,7 +111,7 @@ public class JsEventFileParser {
 			JsEventDesc desc = new JsEventDesc();
 			desc.setCompId(GLOBAL);
 			desc.setName(GLOBAL);
-			desc.setFunc(fileStr.substring(bindex + GLOBALBEGIN.length(), eindex));
+			desc.setFunc(fileStr.substring(bindex + GLOBALBEGIN.length() + 1, eindex));
 			return desc;
 		}
 		return null;

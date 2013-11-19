@@ -7,6 +7,7 @@ public class JsEventDesc implements Serializable {
 	private String name;
 	private String func;
 	private String compId;
+	private boolean dirty = false;
 	public String getCompId() {
 		return compId;
 	}
@@ -24,5 +25,11 @@ public class JsEventDesc implements Serializable {
 	}
 	public void setFunc(String func) {
 		this.func = func;
+	}
+	public void setDirty(boolean b) {
+		this.dirty = b;
+	}
+	public boolean isDirty(){
+		return this.dirty;
 	}
 }

@@ -12,7 +12,6 @@ import net.juniper.wtftools.designer.utils.JsEventDesc;
 import net.juniper.wtftools.designer.utils.JsEventFileParser;
 import net.juniper.wtftools.designer.utils.JsonFormatTool;
 import net.juniper.wtftools.designer.utils.WtfStringUtils;
-import net.sf.json.JSONObject;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.core.runtime.IPath;
@@ -30,14 +29,42 @@ public class ApplicationUpdateHelper {
 	private static final String BR = "\n";
 	private static final String TAB = "\t";
 
-
-
-	public static void update(IPath appPath, IPath restPath, IPath htmlPath, Map<String, String> metadataMap, String htmlContent){
+	public static void updateModel(IPath appPath, Map<String, String> modelMap) {
 		String metadataPath = appPath.append("model.js").toOSString();
 		String modelStr = getFile(metadataPath);
-		if(modelStr == null || modelStr.trim().equals(""))
-			modelStr = "wdefine(function(){\n});";
-		modelStr = updateCode(modelStr, metadataMap, "metadata");
+		modelStr = fixModelContent(modelStr);
+		modelStr = updateModel(modelStr, modelMap);
+		updateFile(metadataPath, modelStr);
+	}
+	
+	
+	private static String updateModel(String modelStr, Map<String, String> modelMap) {
+		Iterator<Entry<String, String>> it = modelMap.entrySet().iterator();
+		while(it.hasNext()){
+			Entry<String, String> entry = it.next();
+			String id = entry.getKey();
+			String startStr = "$app.model('" + id + "'";
+			int index = modelStr.indexOf(startStr);
+			int endIndex = -1;
+			if(index == -1){
+				index = modelStr.lastIndexOf("});");
+			}
+			else{
+				endIndex = modelStr.indexOf(");\n", index) + ");\n".length();
+			}
+			
+			String replaceStr = "$app.model('" + id + "', " + JsonFormatTool.formatJson(entry.getValue(), "\t") + "\n);\n";
+			modelStr = WtfStringUtils.replaceString(index, endIndex, modelStr, replaceStr);
+		}
+		return modelStr;
+	}
+
+
+	public static void updateMetadataAndHtml(IPath appPath, IPath restPath, IPath htmlPath, Map<String, String> metadataMap, String htmlContent){
+		String metadataPath = appPath.append("model.js").toOSString();
+		String modelStr = getFile(metadataPath);
+		modelStr = fixModelContent(modelStr);
+		modelStr = updateMetadata(modelStr, metadataMap);
 		updateFile(metadataPath, modelStr);
 		
 //		String controllerPath = appPath.append("controller.js").toOSString();
@@ -51,37 +78,36 @@ public class ApplicationUpdateHelper {
 		updateFile(htmlPath.toOSString(), htmlContent);
 	}
 	
+	private static String fixModelContent(String modelStr) {
+		if(modelStr == null || modelStr.trim().equals(""))
+			modelStr = "wdefine(function(){\n});";
+		return modelStr;
+	}
+
 	public static void updateController(IPath controllerPath, List<JsEventDesc> eventList){
 		try {
 			String controllerStr = FileUtils.readFileToString(controllerPath.toFile());
-			int index = controllerStr.indexOf(JsEventFileParser.GLOBALBEGIN);
-			int endIndex = -1;
-			if(index == -1){
-				String modelStr = "wdefine(function(){\n";
-				index = controllerStr.indexOf(modelStr) + modelStr.length();
-			}
-			else{
-				endIndex = controllerStr.indexOf(JsEventFileParser.GLOBALEND) + JsEventFileParser.GLOBALEND.length();
-			}
+			controllerStr = fixControllerContent(controllerStr);
+			int index = controllerStr.indexOf(JsEventFileParser.GLOBALBEGIN) + (JsEventFileParser.GLOBALBEGIN + "\n").length();
+			int endIndex = controllerStr.indexOf(JsEventFileParser.GLOBALEND);
 			
-			String content = JsEventFileParser.GLOBALBEGIN + "\n\n" + getGlobalMethodContent(eventList) + "\n\n" + JsEventFileParser.GLOBALEND + "\n\n";
-			controllerStr = WtfStringUtils.replaceString(index, endIndex, controllerStr, content);
-//			String beginStr = controllerStr.substring(0, index);
-//			String endStr = null;
-//			int lIndex = controllerStr.indexOf(JsEventFileParser.GLOBALEND);
-//			if(lIndex == -1){
-//				endStr = controllerStr.substring(index);
-//			}
-//			else
-//				endStr = controllerStr.substring(lIndex + JsEventFileParser.GLOBALEND.length());
-//			String fileStr = beginStr + content + endStr;
-			
+			String content = getGlobalMethodContent(eventList);
+			if(content != null && !content.equals("")){
+				content = WtfStringUtils.addTab(getGlobalMethodContent(eventList)) + "\n";
+				controllerStr = WtfStringUtils.replaceString(index, endIndex, controllerStr, content);
+			}
+
 			Iterator<JsEventDesc> it = eventList.iterator();
+			int eventStart = controllerStr.indexOf(JsEventFileParser.EVENTBEGIN) + (JsEventFileParser.EVENTBEGIN + "\n").length();
 			while(it.hasNext()){
 				JsEventDesc desc = it.next();
 				if(desc.getName().equals(JsEventFileParser.GLOBAL))
 					continue;
-				controllerStr = updateEventController(controllerStr, desc.getCompId(), desc.getName(), desc.getFunc());
+				if(desc.isDirty()){
+					controllerStr = updateDirtyEventController(controllerStr, desc.getCompId(), desc.getName(), eventStart);
+				}
+				else
+					controllerStr = updateEventController(controllerStr, desc.getCompId(), desc.getName(), desc.getFunc(), eventStart);
 			}
 			FileUtils.writeStringToFile(controllerPath.toFile(), controllerStr);
 		} 
@@ -90,28 +116,60 @@ public class ApplicationUpdateHelper {
 		}
 	}
 	
-	private static String updateEventController(String controllerStr, String compId, String eventName, String content) {
-		int index = controllerStr.indexOf(JsEventFileParser.EVENTBEGIN);
+	/**
+	 * fix content for global scope and event scope
+	 * @param controllerStr
+	 * @return
+	 */
+	private static String fixControllerContent(String controllerStr) {
+		if(controllerStr == null || controllerStr.trim().equals(""))
+			controllerStr = "wdefine(function(){\n});";
+		int index = controllerStr.indexOf(JsEventFileParser.GLOBALBEGIN);
 		if(index == -1){
-			int gindex = controllerStr.indexOf(JsEventFileParser.GLOBALEND) + JsEventFileParser.GLOBALEND.length();
-			controllerStr = WtfStringUtils.replaceString(gindex, -1, controllerStr, JsEventFileParser.EVENTBEGIN + "\n" + JsEventFileParser.EVENTEND + "\n");
+			String modelStr = "wdefine(function(){\n";
+			index = controllerStr.indexOf(modelStr) + modelStr.length();
+			//add globalbegin/end
+			controllerStr = WtfStringUtils.replaceString(index, -1, controllerStr, JsEventFileParser.GLOBALBEGIN + "\n" + JsEventFileParser.GLOBALEND + "\n");
 		}
 		
-		index = controllerStr.indexOf(JsEventFileParser.EVENTBEGIN) + JsEventFileParser.EVENTBEGIN.length() + 1;
+		index = controllerStr.indexOf(JsEventFileParser.EVENTBEGIN);
+		if(index == -1){
+			index = controllerStr.indexOf(JsEventFileParser.GLOBALEND) + (JsEventFileParser.GLOBALEND + "\n").length();
+			//add globalbegin/end
+			controllerStr = WtfStringUtils.replaceString(index, -1, controllerStr, "\n" + JsEventFileParser.EVENTBEGIN + "\n" + JsEventFileParser.EVENTEND + "\n");
+		}
+		return controllerStr;
+	}
+
+	private static String updateDirtyEventController(String controllerStr, String compId, String eventName, int eventStart) {
+		String str = "$app.component('" + compId + "').on('" + eventName + "'";
+		int eventIndex = controllerStr.indexOf(str, eventStart);
+		//doesn't exist, return
+		if(eventIndex == -1)
+			return controllerStr;
+		
+		//TODO, should be more strict
+		String listenerEndStr = "});";
+		int eventEndIndex = controllerStr.indexOf(listenerEndStr, eventIndex) + (listenerEndStr + "\n").length();
+		return WtfStringUtils.replaceString(eventIndex, eventEndIndex, controllerStr, "");
+	}
+	
+	private static String updateEventController(String controllerStr, String compId, String eventName, String content, int eventStart) {
+		
 		String str = "$app.component('" + compId + "').on('" + eventName + "'";
 		
-		int eventIndex = controllerStr.indexOf(str);
+		int eventIndex = controllerStr.indexOf(str, eventStart);
 		int eventEndIndex = -1;
 		if(eventIndex == -1){
-			eventIndex = index;
+			eventIndex = eventStart;
 		}
 		else{
-			eventEndIndex = controllerStr.indexOf("});", eventIndex) + "});".length();
+			String funcEndStr = "});";
+			eventEndIndex = controllerStr.indexOf(funcEndStr, eventIndex) + (funcEndStr + "\n").length();
 		}
 		
-		String eventStr = str + ", function(options){\n" + content + "\n});\n";
+		String eventStr = str + ", function(options){" + WtfStringUtils.addTab("\n" + content) + "\n});\n";
 		return WtfStringUtils.replaceString(eventIndex, eventEndIndex, controllerStr, eventStr);
-//		return bstr + "\n" + eventStr + estr;
 	}
 	
 	private static String getGlobalMethodContent(List<JsEventDesc> eventList) {
@@ -226,29 +284,29 @@ public class ApplicationUpdateHelper {
 		
 	}
 
-
-
-	private static String updateCode(String modelStr, Map<String, String> metadataMap, String sign) {
+	private static String updateMetadata(String modelStr, Map<String, String> metadataMap) {
 		Iterator<Entry<String, String>> it = metadataMap.entrySet().iterator();
 		while(it.hasNext()){
 			Entry<String, String> entry = it.next();
 			String id = entry.getKey();
-			String startStr = getStartString(id, sign);
-			int start = modelStr.indexOf(getStartString(id, sign));
-			if(start == -1){
-				String value = entry.getValue();
-				if(value == null || value.equals("") || value.equals("null"))
-					return modelStr;
-				modelStr = addToString(id, modelStr, value, sign);
+			String startStr = "$app.metadata('" + id + "'";
+			int index = modelStr.indexOf(startStr);
+			int endIndex = -1;
+			if(index == -1){
+				index = modelStr.lastIndexOf("});");
 			}
 			else{
-				String value = entry.getValue();
-				if(value == null)
-					value = "";
-				start = start + startStr.length();
-				int end = modelStr.indexOf(getEndString(), start);
-				modelStr = updateString(id, modelStr, start, end, value, sign);
+				endIndex = modelStr.indexOf(");\n", index) + ");\n".length();
 			}
+			
+//			JSONObject obj = JSONObject.fromObject(entry.getValue());
+//			String modelId = (String) obj.get("model");
+//			String url = modelId.substring(0, modelId.lastIndexOf("_model")) + "s";
+//			String serviceUrl = url;
+//			String str = "$app.model('" + modelId + "', {url:'" + serviceUrl + "'});\n";
+//			str += "var metadata_" + id + " = " + metadata + ";" + BR;
+			String replaceStr = "$app.metadata('" + id + "', " + JsonFormatTool.formatJson(entry.getValue(), "\t") + "\n);\n";
+			modelStr = WtfStringUtils.replaceString(index, endIndex, modelStr, replaceStr);
 		}
 		return modelStr;
 	}
@@ -264,13 +322,13 @@ public class ApplicationUpdateHelper {
 		}
 	}
 	
-	private static String getStartString(String id, String type) {
-		return "/*\n* definition of" + type + ":" + id + "\n*/";
-	}
-
-	private static String getEndString() {
-		return "/*\n* definition end\n*/";
-	}
+//	private static String getStartString(String id, String type) {
+//		return "/*\n* definition of" + type + ":" + id + "\n*/";
+//	}
+//
+//	private static String getEndString() {
+//		return "/*\n* definition end\n*/";
+//	}
 	
 	private static void updateFile(String path, String str) {
 		try {
@@ -284,29 +342,29 @@ public class ApplicationUpdateHelper {
 	}
 	
 
-	private static String updateString(String id, String fullCodes, int start, int end, String updateStr, String sign) {
-		return fullCodes.substring(0, start) + BR + generateCodes(id, updateStr, sign) + BR + fullCodes.substring(end);
-	}
+//	private static String updateString(String id, String fullCodes, int start, int end, String updateStr, String sign) {
+//		return fullCodes.substring(0, start) + BR + generateCodes(id, updateStr, sign) + BR + fullCodes.substring(end);
+//	}
 
-	private static String addToString(String id, String fullCodes, String metadata, String sign) {
-		int lastIndex = fullCodes.lastIndexOf("}");
-		fullCodes = fullCodes.substring(0, lastIndex) + BR + getStartString(id, sign) + BR + generateCodes(id, metadata, sign) + BR + getEndString() + BR + fullCodes.substring(lastIndex);
-		return fullCodes;
-	}
+//	private static String addToString(String id, String fullCodes, String metadata, String sign) {
+//		int lastIndex = fullCodes.lastIndexOf("}");
+//		fullCodes = fullCodes.substring(0, lastIndex) + BR + getStartString(id, sign) + BR + generateCodes(id, metadata, sign) + BR + getEndString() + BR + fullCodes.substring(lastIndex);
+//		return fullCodes;
+//	}
 
 
-	private static String generateCodes(String id, String metadata, String sign) {
-		if(sign.equals("metadata")){
-			JSONObject obj = JSONObject.fromObject(metadata);
-			String modelId = (String) obj.get("model");
-			String url = modelId.substring(0, modelId.lastIndexOf("_model")) + "s";
-			String serviceUrl = url;
-			String str = "$app.model('" + modelId + "', {url:'" + serviceUrl + "'});\n";
-//			str += "var metadata_" + id + " = " + metadata + ";" + BR;
-			return str + "$app.metadata('" + id + "', " + JsonFormatTool.formatJson(metadata, "\t") + "\n);";
-		}
-		else{
-			return TAB + JsonFormatTool.formatJson(metadata, "\t");
-		}
-	}
+//	private static String generateCodes(String id, String metadata, String sign) {
+//		if(sign.equals("metadata")){
+//			JSONObject obj = JSONObject.fromObject(metadata);
+//			String modelId = (String) obj.get("model");
+//			String url = modelId.substring(0, modelId.lastIndexOf("_model")) + "s";
+//			String serviceUrl = url;
+//			String str = "$app.model('" + modelId + "', {url:'" + serviceUrl + "'});\n";
+////			str += "var metadata_" + id + " = " + metadata + ";" + BR;
+//			return str + "$app.metadata('" + id + "', " + JsonFormatTool.formatJson(metadata, "\t") + "\n);";
+//		}
+//		else{
+//			return TAB + JsonFormatTool.formatJson(metadata, "\t");
+//		}
+//	}
 }

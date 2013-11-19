@@ -31,11 +31,13 @@ public class EntitySelectionEventHandler extends AbstractBrowserEventHandler{
 			result.put("restapiExist", true);
 		}
 		
+		String simpleName = className.substring(className.lastIndexOf(".") + 1);
+		
 		String serviceName = null;
-		if(className.endsWith("Entity"))
-			serviceName = className.substring(0, className.length() - "Entity".length()).toLowerCase() + "s";
+		if(simpleName.endsWith("Entity"))
+			serviceName = simpleName.substring(0, simpleName.length() - "Entity".length()).toLowerCase() + "s";
 		else
-			serviceName = className.toLowerCase() + "s";
+			serviceName = simpleName.toLowerCase() + "s";
 		result.put("serviceName", serviceName);
 		result.put("modelId", serviceName + "Model");
 //			WtfToolsActivator.getDefault().logInfo("=== parsing class:" + className);

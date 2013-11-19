@@ -2,6 +2,7 @@ package net.juniper.wtftools.editor;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -30,6 +31,8 @@ import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.IViewReference;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.part.FileEditorInput;
@@ -45,6 +48,7 @@ public class BrowserDesignEditor extends EditorPart {
 	private IPath htmlPath;
 	private String appId;
 	private boolean dirty = false;
+	private Map<String, String> metadataMap = new HashMap<String, String>();
 	private Map<String, String> modelMap = new HashMap<String, String>();
 //	private Map<String, String> controllerMap = new HashMap<String, String>();
 	private String htmlContent;
@@ -52,7 +56,7 @@ public class BrowserDesignEditor extends EditorPart {
 	private TextEditor controllerEditor;
 	private TextEditor modelEditor;
 	private List<JsEventDesc> existingEvents; 
-
+	private List<IViewReference> hiddenViews = new ArrayList<IViewReference>();
 	public void setDirty(boolean dirty) {
 		if (this.dirty == dirty)
 			return;
@@ -62,18 +66,21 @@ public class BrowserDesignEditor extends EditorPart {
 
 	@Override
 	public void doSave(IProgressMonitor monitor) {
-		ApplicationUpdateHelper.update(appPath, restPath, htmlPath, modelMap, htmlContent);
+		ApplicationUpdateHelper.updateModel(appPath, modelMap);
+		ApplicationUpdateHelper.updateMetadataAndHtml(appPath, restPath, htmlPath, metadataMap, htmlContent);
 		ApplicationUpdateHelper.updateController(appPath.append("controller.js"), existingEvents);
-		modelMap.clear();
+		metadataMap.clear();
 		htmlContent = null;
 		existingEvents = null;
-		setDirty(false);
 		htmlEditor.doSave();
 		controllerEditor.doSave();
 		modelEditor.doSave();
+		setDirty(false);
 		try {
 			WtfProjectCommonTools.getCurrentProject().refreshLocal(
 					IProject.DEPTH_INFINITE, null);
+			browser.refresh();
+			this.reInit();
 		} catch (CoreException e) {
 			WtfToolsActivator.getDefault().logError(e);
 		}
@@ -98,13 +105,17 @@ public class BrowserDesignEditor extends EditorPart {
 			restPath = restPath.removeLastSegments(1);
 		}
 		restPath = restPath.removeLastSegments(1).append("rest");
+		reInit();
+	}
+
+	private void reInit() {
 		existingEvents = new JsEventFileParser().getEvents(appPath.append("controller.js").toFile());
 		
 		try {
 			htmlContent = FileUtils.readFileToString(htmlPath.toFile());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} 
+		catch (IOException e) {
+			WtfToolsActivator.getDefault().logError(e);
 		}
 	}
 
@@ -132,6 +143,18 @@ public class BrowserDesignEditor extends EditorPart {
 		createModelSourceTab(parent, tab);
 		createHtmlSourceTab(parent, tab);
 		startDirtyMonitor();
+		IWorkbenchPage wp = this.getEditorSite().getWorkbenchWindow().getActivePage();
+		IViewReference[] views = wp.getViewReferences();
+		for(int i = 0; i < views.length; i ++){
+			IViewReference view = views[i];
+			if(!view.getId().equals("org.eclipse.jdt.ui.PackageExplorer")){
+//				view.getView(true).getSite().getPart().dispose();
+				wp.setPartState(view, IWorkbenchPage.STATE_MINIMIZED);
+				hiddenViews.add(view);
+//				wp.hideView(view);
+			}
+		}
+		
 	}
 
 	private void createModelSourceTab(Composite parent, TabFolder tab) {
@@ -272,8 +295,8 @@ public class BrowserDesignEditor extends EditorPart {
 		this.htmlContent = html;
 	}
 
-	public void addModel(String key, String metadata) {
-		this.modelMap.put(key, metadata);
+	public void addMetadata(String key, String metadata) {
+		this.metadataMap.put(key, metadata);
 	}
 
 	public void addController(String id, String name, String funcContent) {
@@ -297,6 +320,15 @@ public class BrowserDesignEditor extends EditorPart {
 
 	@Override
 	public void dispose() {
+		if(hiddenViews.size() > 0){
+			Iterator<IViewReference> it = hiddenViews.iterator();
+			while(it.hasNext()){
+				IViewReference view = it.next();
+				this.getEditorSite().getPage().setPartState(view, IWorkbenchPage.STATE_RESTORED);
+			}
+			hiddenViews.clear();
+		}
+		
 		htmlEditor.clearChanged();
 		controllerEditor.clearChanged();
 		modelEditor.clearChanged();
@@ -309,6 +341,10 @@ public class BrowserDesignEditor extends EditorPart {
 
 	public void setExistingEvents(List<JsEventDesc> existingEvents) {
 		this.existingEvents = existingEvents;
+	}
+
+	public void addModel(String key, String value) {
+		this.modelMap.put(key, value);
 	}
 
 }

@@ -1,12 +1,13 @@
 package net.juniper.wtftools.designer;
 
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import net.juniper.wtftools.designer.utils.JsEventDesc;
 import net.juniper.wtftools.designer.utils.JsEventFileParser;
+import net.juniper.wtftools.designer.utils.JsURLEncoder;
+import net.juniper.wtftools.designer.utils.WtfStringUtils;
 import net.juniper.wtftools.editor.BrowserDesignEditor;
 import net.sf.json.JSONObject;
 
@@ -24,14 +25,14 @@ public class GetEventMethodsHandler extends AbstractBrowserEventHandler {
 				eventStr += desc.getName();
 				if(i != descs.length - 1)
 					eventStr += ",";
-				result.put("method_" + desc.getName(), URLEncoder.encode(desc.getFunc()));
+				result.put("method_" + desc.getName(), JsURLEncoder.encode(WtfStringUtils.removeTab(desc.getFunc())));
 			}
 			result.put("methods", eventStr);
 		}
 		
 		descs = eventDescs(editor.getExistingEvents(), JsEventFileParser.GLOBAL);
 		if(descs != null && descs.length > 0){
-			result.put("globalmethod", URLEncoder.encode(descs[0].getFunc()));
+			result.put("methodGlobalContent", JsURLEncoder.encode(WtfStringUtils.removeTab(descs[0].getFunc())));
 		}
 		return result;
 	}
