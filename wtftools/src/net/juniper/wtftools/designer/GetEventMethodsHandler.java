@@ -15,7 +15,7 @@ public class GetEventMethodsHandler extends AbstractBrowserEventHandler {
 
 	@Override
 	public JSONObject handle(BrowserDesignEditor editor, JSONObject json) {
-		String id = json.getString("eleid");
+		String id = json.getString("compId");
 		JSONObject result = new JSONObject();
 		JsEventDesc[] descs = eventDescs(editor.getExistingEvents(), id);
 		String eventStr = new String();
