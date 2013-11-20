@@ -104,10 +104,10 @@ public class ApplicationUpdateHelper {
 				if(desc.getName().equals(JsEventFileParser.GLOBAL))
 					continue;
 				if(desc.isDirty()){
-					controllerStr = updateDirtyEventController(controllerStr, desc.getCompId(), desc.getName(), eventStart);
+					controllerStr = updateDirtyEventController(controllerStr, desc, eventStart);
 				}
 				else
-					controllerStr = updateEventController(controllerStr, desc.getCompId(), desc.getName(), desc.getFunc(), eventStart);
+					controllerStr = updateEventController(controllerStr, desc, eventStart);
 			}
 			FileUtils.writeStringToFile(controllerPath.toFile(), controllerStr);
 		} 
@@ -141,8 +141,16 @@ public class ApplicationUpdateHelper {
 		return controllerStr;
 	}
 
-	private static String updateDirtyEventController(String controllerStr, String compId, String eventName, int eventStart) {
-		String str = "$app.component('" + compId + "').on('" + eventName + "'";
+	private static String updateDirtyEventController(String controllerStr, JsEventDesc eventDesc, int eventStart) {
+		String keyPart = null;
+		if(eventDesc.isModel()){
+			keyPart = "model";
+		}
+		else
+			keyPart = "component";
+		String compId = eventDesc.getCompId();
+		String eventName = eventDesc.getName();
+		String str = "$app." + keyPart + "('" + compId + "').on('" + eventName + "'";
 		int eventIndex = controllerStr.indexOf(str, eventStart);
 		//doesn't exist, return
 		if(eventIndex == -1)
@@ -154,9 +162,17 @@ public class ApplicationUpdateHelper {
 		return WtfStringUtils.replaceString(eventIndex, eventEndIndex, controllerStr, "");
 	}
 	
-	private static String updateEventController(String controllerStr, String compId, String eventName, String content, int eventStart) {
+	private static String updateEventController(String controllerStr, JsEventDesc eventDesc, int eventStart) {
 		
-		String str = "$app.component('" + compId + "').on('" + eventName + "'";
+		String keyPart = null;
+		if(eventDesc.isModel()){
+			keyPart = "model";
+		}
+		else
+			keyPart = "component";
+		String compId = eventDesc.getCompId();
+		String eventName = eventDesc.getName();
+		String str = "$app." + keyPart + "('" + compId + "').on('" + eventName + "'";
 		
 		int eventIndex = controllerStr.indexOf(str, eventStart);
 		int eventEndIndex = -1;
@@ -168,7 +184,7 @@ public class ApplicationUpdateHelper {
 			eventEndIndex = controllerStr.indexOf(funcEndStr, eventIndex) + (funcEndStr + "\n").length();
 		}
 		
-		String eventStr = str + ", function(options){" + WtfStringUtils.addTab("\n" + content) + "\n});\n";
+		String eventStr = str + ", function(options){" + WtfStringUtils.addTab("\n" + eventDesc.getFunc()) + "\n});\n";
 		return WtfStringUtils.replaceString(eventIndex, eventEndIndex, controllerStr, eventStr);
 	}
 	

@@ -10,7 +10,6 @@ import javax.xml.bind.annotation.XmlType;
 import net.juniper.wtftools.WtfToolsActivator;
 import net.juniper.wtftools.core.WtfProjectCommonTools;
 import net.juniper.wtftools.editor.BrowserDesignEditor;
-import net.juniper.wtftools.rest.RestGeneratorHelper;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -20,7 +19,7 @@ import org.eclipse.swt.widgets.Display;
 
 public class GetEntityInfoEventHandler extends AbstractBrowserEventHandler{
 
-	private static final String ENTITY_INFO = "entityinfo";
+	private static final String ENTITY_INFO = "entityInfo";
 
 	private JSONArray getColumnInfos(Class c) throws EventHandlerException{
 		Entity entity = (Entity) c.getAnnotation(Entity.class);
@@ -89,7 +88,7 @@ public class GetEntityInfoEventHandler extends AbstractBrowserEventHandler{
 	@Override
 	public JSONObject handle(BrowserDesignEditor editor, JSONObject json) {
 		try{
-			String className = json.getString("selectedClass");
+			String className = json.getString("entityName");
 			if(className == null){
 				return null;
 			}
@@ -98,10 +97,6 @@ public class GetEntityInfoEventHandler extends AbstractBrowserEventHandler{
 			JSONObject result = new JSONObject();
 			JSONArray columnInfos = getColumnInfos(c);
 			result.put("columnInfos", columnInfos); 
-			if(!RestGeneratorHelper.restExist(className)){
-				result.put("generateClass", className);
-			}
-			result.put("restservice", className.substring(className.lastIndexOf(".") + 1).toLowerCase());
 			return result;
 		}
 		catch(EventHandlerException e){

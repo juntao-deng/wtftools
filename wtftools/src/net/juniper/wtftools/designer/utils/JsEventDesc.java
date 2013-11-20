@@ -7,6 +7,13 @@ public class JsEventDesc implements Serializable {
 	private String name;
 	private String func;
 	private String compId;
+	private boolean model;
+	public boolean isModel() {
+		return model;
+	}
+	public void setModel(boolean model) {
+		this.model = model;
+	}
 	private boolean dirty = false;
 	public String getCompId() {
 		return compId;
