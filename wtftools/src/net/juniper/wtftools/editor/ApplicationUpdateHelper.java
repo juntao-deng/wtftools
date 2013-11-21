@@ -273,7 +273,16 @@ public class ApplicationUpdateHelper {
 	private static void processNode(Node node) {
 		NodeList cList = node.getChildren();
 		if(node instanceof Div && ((Div)node).getAttribute("wtftype") != null && (!((Div)node).getAttribute("wtftype").equals("container"))){
-			node.setChildren(null);
+			NodeList newCList = new NodeList();
+			if(cList != null){
+				SimpleNodeIterator it = cList.elements();
+				while(it.hasMoreNodes()){
+					Node cNode = it.nextNode();
+					processForPos(newCList, cNode);
+					
+				}
+			}
+			node.setChildren(newCList);
 			cList = null;
 		}
 		
@@ -298,6 +307,30 @@ public class ApplicationUpdateHelper {
 			}
 		}
 	}
+
+	private static void processForPos(NodeList newCList, Node cNode) {
+		NodeList ccNodeList = cNode.getChildren();
+		if(cNode instanceof Div && ((Div)cNode).getAttribute("wtfpos") != null){
+			if(ccNodeList != null){
+				SimpleNodeIterator it = ccNodeList.elements();
+				while(it.hasMoreNodes()){
+					Node ccNode = it.nextNode();
+					processNode(ccNode);
+				}
+				newCList.add(ccNodeList);
+			}
+		}
+		else{
+			if(ccNodeList != null){
+				SimpleNodeIterator it = ccNodeList.elements();
+				while(it.hasMoreNodes()){
+					Node ccNode = it.nextNode();
+					processForPos(newCList, ccNode);
+				}
+			}
+		}
+	}
+
 
 	private static String updateMetadata(String modelStr, Map<String, String> metadataMap) {
 		Iterator<Entry<String, String>> it = metadataMap.entrySet().iterator();
