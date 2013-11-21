@@ -299,12 +299,12 @@ public class BrowserDesignEditor extends EditorPart {
 		this.metadataMap.put(key, metadata);
 	}
 
-	public void addController(String id, String name, String funcContent, boolean isModel) {
+	public void addController(String id, String name, String funcContent, String type) {
 		Iterator<JsEventDesc> it = existingEvents.iterator();
 		JsEventDesc eventDesc = null;
 		while(it.hasNext()){
 			JsEventDesc desc = it.next();
-			if(desc.getName().equals(name) && desc.getCompId().equals(id) && desc.isModel() == isModel){
+			if(desc.getName().equals(name) && desc.getCompId().equals(id) && desc.getType().equals(type)){
 				eventDesc = desc;
 				break;
 			}
@@ -313,7 +313,7 @@ public class BrowserDesignEditor extends EditorPart {
 			eventDesc = new JsEventDesc();
 			eventDesc.setName(name);
 			eventDesc.setCompId(id);
-			eventDesc.setModel(isModel);
+			eventDesc.setType(type);
 			existingEvents.add(eventDesc);
 		}
 		eventDesc.setFunc(funcContent);

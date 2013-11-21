@@ -4,16 +4,14 @@ import java.io.Serializable;
 
 public class JsEventDesc implements Serializable {
 	private static final long serialVersionUID = -3331080908570086067L;
+	public static final String TYPE_MODEL = "1";
+	public static final String TYPE_COMPONENT = "0";
+	public static final String TYPE_APP = "2";
 	private String name;
 	private String func;
 	private String compId;
-	private boolean model;
-	public boolean isModel() {
-		return model;
-	}
-	public void setModel(boolean model) {
-		this.model = model;
-	}
+	private String type;
+	
 	private boolean dirty = false;
 	public String getCompId() {
 		return compId;
@@ -38,5 +36,11 @@ public class JsEventDesc implements Serializable {
 	}
 	public boolean isDirty(){
 		return this.dirty;
+	}
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
 	}
 }

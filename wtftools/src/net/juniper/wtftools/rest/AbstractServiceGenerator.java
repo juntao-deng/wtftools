@@ -38,8 +38,8 @@ public abstract class AbstractServiceGenerator implements ServiceGenerator {
 		String template = readTemplateFile(tPath);
 		template = doReplace(template);
 		String path = getTargetPath();
-		path = WtfProjectCommonTools.getCurrentWtfProject().getLocation().toOSString() + "/" + getSourcePath() + "/" + path;
-		writeToSystem(template, path);
+		String fullPath = WtfProjectCommonTools.getCurrentWtfProject().getLocation().toOSString() + "/" + getSourcePath() + "/" + path;
+		writeToSystem(template, fullPath);
 		return path;
 	}
 	

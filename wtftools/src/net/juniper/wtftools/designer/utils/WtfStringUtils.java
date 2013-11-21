@@ -18,9 +18,10 @@ public final class WtfStringUtils {
 	public static String addTab(String sourceStr){
 		if(sourceStr == null || sourceStr.equals(""))
 			return sourceStr;
+		sourceStr = "\t" + sourceStr;
 		sourceStr = sourceStr.replaceAll("\n", "\n\t");
-		if(sourceStr.endsWith("\n\t}"))
-			sourceStr = sourceStr.substring(0, sourceStr.length() - 3) + "\n}";
+//		if(sourceStr.endsWith("\n\t}"))
+//			sourceStr = sourceStr.substring(0, sourceStr.length() - 3) + "\n}";
 		return sourceStr;
 	}
 	

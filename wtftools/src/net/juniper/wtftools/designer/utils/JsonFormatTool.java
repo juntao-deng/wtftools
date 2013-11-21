@@ -42,11 +42,14 @@ public class JsonFormatTool {
              
             if (token.equals(",")) { 
                 buf.append(token); 
-                doFill(buf, count, fillStringUnit); 
+                if(tokenList.get(i - 1).equals("}") || tokenList.get(i - 1).equals("]"))
+                	doFill(buf, count, fillStringUnit); 
+                else
+                	buf.append(" ");
                 continue; 
             } 
             if (token.equals(":")) { 
-                buf.append(" ").append(token).append(" "); 
+                buf.append(token).append(" "); 
                 continue; 
             } 
             if (token.equals("{")) { 
@@ -57,13 +60,13 @@ public class JsonFormatTool {
                 } else { 
                     count++; 
                     buf.append(token); 
-                    doFill(buf, count, fillStringUnit); 
+//                    doFill(buf, count, fillStringUnit); 
                 } 
                 continue; 
             } 
             if (token.equals("}")) { 
                 count--; 
-                doFill(buf, count, fillStringUnit); 
+//                doFill(buf, count, fillStringUnit); 
                 buf.append(token); 
                 continue; 
             } 
@@ -75,25 +78,31 @@ public class JsonFormatTool {
                 } else { 
                     count++; 
                     buf.append(token); 
-                    doFill(buf, count, fillStringUnit); 
+//                    doFill(buf, count, fillStringUnit); 
                 } 
                 continue; 
             } 
             if (token.equals("]")) { 
                 count--; 
-                doFill(buf, count, fillStringUnit); 
+//                doFill(buf, count, fillStringUnit); 
                 buf.append(token); 
                 continue; 
             } 
-             
+            boolean isVariable = i < tokenList.size() - 1 && tokenList.get(i + 1).equals(":");
+            if(isVariable){
+            	//trim token
+            	token = token.trim();
+            	if(token.charAt(0) == '\"')
+            		token = token.substring(1, token.length() - 1);
+            }
             buf.append(token); 
-            if (i < tokenList.size() - 1 && tokenList.get(i + 1).equals(":")) { 
-                int fillLength = fixedLenth - token.getBytes().length; 
-                if (fillLength > 0) { 
-                    for(int j = 0; j < fillLength; j++) { 
+            if (isVariable) { 
+//                int fillLength = fixedLenth - token.getBytes().length; 
+//                if (fillLength > 0) { 
+//                    for(int j = 0; j < fillLength; j++) { 
                         buf.append(" "); 
-                    } 
-                } 
+//                    } 
+//                } 
             } 
         } 
         return buf.toString(); 

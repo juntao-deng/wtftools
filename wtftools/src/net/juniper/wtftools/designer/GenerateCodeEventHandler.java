@@ -12,7 +12,7 @@ public class GenerateCodeEventHandler extends AbstractBrowserEventHandler{
 	private static final String GENERATE_CODE = "generatecode";
 	@Override
 	public JSONObject handle(BrowserDesignEditor editor, JSONObject json) {
-		String className = json.getString("selectedClass");
+		String className = json.getString("entityName");
 		JSONObject result = new JSONObject();
 		if(className == null){
 			result.put("errormsg", "No entity selected");

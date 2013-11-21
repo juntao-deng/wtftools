@@ -11,7 +11,6 @@ public class BrowserEventHandlerFactory {
 	static{
 		handlers.add(new EntitySelectionEventHandler());
 		handlers.add(new HtmlFileChangeEventHandler());
-//		handlers.add(new JsFileChangeEventHandler());
 		handlers.add(new RestChangeEventHandler());
 		handlers.add(new UpdateStateEventHandler());
 		handlers.add(new GenerateCodeEventHandler());
@@ -20,6 +19,7 @@ public class BrowserEventHandlerFactory {
 		handlers.add(new UpdateMetadataEventHandler());
 		handlers.add(new UpdateModelEventHandler());
 		handlers.add(new ClearEventsEventHandler());
+		handlers.add(new GetEntityInfoEventHandler());
 	}
 	
 	public static JSONObject handleEvent(BrowserDesignEditor editor, String str){

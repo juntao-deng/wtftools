@@ -12,12 +12,12 @@ public class UpdateControllerEventHandler extends AbstractBrowserEventHandler {
 			String compId = json.getString("compId");
 			String eventName = json.getString("eventName");
 			String eventContent = json.has("eventContent") ? json.getString("eventContent") : "";
-			boolean isModel = json.has("isModel") && json.getBoolean("isModel");
-			editor.addController(compId, eventName, eventContent, isModel);
+			String type = json.getString("type");
+			editor.addController(compId, eventName, eventContent, type);
 		}
 		if(json.has("methodGlobalContent")){
 			String globalEventContent = json.getString("methodGlobalContent");
-			editor.addController(JsEventFileParser.GLOBAL, JsEventFileParser.GLOBAL, globalEventContent, false);
+			editor.addController(JsEventFileParser.GLOBAL, JsEventFileParser.GLOBAL, globalEventContent, "");
 		}
 		return null;
 	}

@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.juniper.wtftools.WtfToolsActivator;
 import net.juniper.wtftools.designer.utils.JsEventDesc;
@@ -66,13 +68,6 @@ public class ApplicationUpdateHelper {
 		modelStr = fixModelContent(modelStr);
 		modelStr = updateMetadata(modelStr, metadataMap);
 		updateFile(metadataPath, modelStr);
-		
-//		String controllerPath = appPath.append("controller.js").toOSString();
-//		String controllerStr = getFile(controllerPath);
-//		if(controllerStr == null || controllerStr.trim().equals(""))
-//			controllerStr = "wdefine(function(){\r\n});";
-//		controllerStr = updateCode(controllerStr, controllerMap, "controller");
-//		updateFile(controllerPath, controllerStr);
 		
 		htmlContent = fixHtml(htmlContent);
 		updateFile(htmlPath.toOSString(), htmlContent);
@@ -142,50 +137,59 @@ public class ApplicationUpdateHelper {
 	}
 
 	private static String updateDirtyEventController(String controllerStr, JsEventDesc eventDesc, int eventStart) {
-		String keyPart = null;
-		if(eventDesc.isModel()){
-			keyPart = "model";
+		String patternStr = null;
+		if(eventDesc.getType().equals(JsEventDesc.TYPE_COMPONENT))
+			patternStr = JsEventFileParser.COMPONENT_EVENT_PATTERN;
+		else if(eventDesc.getType().equals(JsEventDesc.TYPE_MODEL))
+			patternStr = JsEventFileParser.MODEL_EVENT_PATTERN;
+		else if(eventDesc.getType().equals(JsEventDesc.TYPE_APP))
+			patternStr = JsEventFileParser.APP_EVENT_PATTERN;
+		Pattern p = Pattern.compile(patternStr, Pattern.DOTALL);
+		Matcher m = p.matcher(controllerStr);
+		while(m.find()){
+			String compId = m.group(1);
+			String eventName = m.group(2);
+			if(compId.equals(eventDesc.getCompId()) && eventName.equals(eventDesc.getName())){
+				return m.replaceFirst("");
+			}
 		}
-		else
-			keyPart = "component";
-		String compId = eventDesc.getCompId();
-		String eventName = eventDesc.getName();
-		String str = "$app." + keyPart + "('" + compId + "').on('" + eventName + "'";
-		int eventIndex = controllerStr.indexOf(str, eventStart);
-		//doesn't exist, return
-		if(eventIndex == -1)
-			return controllerStr;
-		
-		//TODO, should be more strict
-		String listenerEndStr = "});";
-		int eventEndIndex = controllerStr.indexOf(listenerEndStr, eventIndex) + (listenerEndStr + "\n").length();
-		return WtfStringUtils.replaceString(eventIndex, eventEndIndex, controllerStr, "");
+		return controllerStr;
 	}
 	
 	private static String updateEventController(String controllerStr, JsEventDesc eventDesc, int eventStart) {
 		
-		String keyPart = null;
-		if(eventDesc.isModel()){
-			keyPart = "model";
+		String script = "\n" + WtfStringUtils.addTab(eventDesc.getFunc()) + "\n";
+		String patternStr = null;
+		if(eventDesc.getType().equals(JsEventDesc.TYPE_COMPONENT))
+			patternStr = JsEventFileParser.COMPONENT_EVENT_PATTERN;
+		else if(eventDesc.getType().equals(JsEventDesc.TYPE_MODEL))
+			patternStr = JsEventFileParser.MODEL_EVENT_PATTERN;
+		else if(eventDesc.getType().equals(JsEventDesc.TYPE_APP))
+			patternStr = JsEventFileParser.APP_EVENT_PATTERN;
+		Pattern p = Pattern.compile(patternStr, Pattern.DOTALL);
+		Matcher m = p.matcher(controllerStr);
+		while(m.find()){
+			String compId = m.group(1);
+			String eventName = m.group(2);
+			if(compId.equals(eventDesc.getCompId()) && eventName.equals(eventDesc.getName())){
+				int start = m.start(3);
+				int end = m.end(5);
+				return WtfStringUtils.replaceString(start, end, controllerStr, script);
+			}
 		}
-		else
-			keyPart = "component";
+		//didn't find, add to tail
 		String compId = eventDesc.getCompId();
+		String keyPart = null;
+		if(eventDesc.getType().equals(JsEventDesc.TYPE_MODEL))
+			keyPart = "$app.model('" + compId + "')";
+		else if(eventDesc.getType().equals(JsEventDesc.TYPE_COMPONENT))
+			keyPart = "$app.component('" + compId + "')";
+		else if(eventDesc.getType().equals(JsEventDesc.TYPE_APP))
+			keyPart = "$app";
 		String eventName = eventDesc.getName();
-		String str = "$app." + keyPart + "('" + compId + "').on('" + eventName + "'";
-		
-		int eventIndex = controllerStr.indexOf(str, eventStart);
-		int eventEndIndex = -1;
-		if(eventIndex == -1){
-			eventIndex = eventStart;
-		}
-		else{
-			String funcEndStr = "});";
-			eventEndIndex = controllerStr.indexOf(funcEndStr, eventIndex) + (funcEndStr + "\n").length();
-		}
-		
-		String eventStr = str + ", function(options){" + WtfStringUtils.addTab("\n" + eventDesc.getFunc()) + "\n});\n";
-		return WtfStringUtils.replaceString(eventIndex, eventEndIndex, controllerStr, eventStr);
+		String str = keyPart + ".on('" + eventName + "'";
+		String eventStr = str + ", function(options){" + script + "});\n";
+		return WtfStringUtils.replaceString(eventStart, -1, controllerStr, eventStr);
 	}
 	
 	private static String getGlobalMethodContent(List<JsEventDesc> eventList) {
@@ -268,9 +272,6 @@ public class ApplicationUpdateHelper {
 
 	private static void processNode(Node node) {
 		NodeList cList = node.getChildren();
-//		if(node instanceof Div && ((Div)node).getAttribute("wtftype") != null && ((Div)node).getAttribute("wtftype").equals("container")){
-//			node.getParent().setChildren(cList);
-//		}
 		if(node instanceof Div && ((Div)node).getAttribute("wtftype") != null && (!((Div)node).getAttribute("wtftype").equals("container"))){
 			node.setChildren(null);
 			cList = null;
@@ -296,8 +297,6 @@ public class ApplicationUpdateHelper {
 				processNode(cNode);
 			}
 		}
-//		NodeList list = node.getChildren();
-		
 	}
 
 	private static String updateMetadata(String modelStr, Map<String, String> metadataMap) {
@@ -314,13 +313,6 @@ public class ApplicationUpdateHelper {
 			else{
 				endIndex = modelStr.indexOf(");\n", index) + ");\n".length();
 			}
-			
-//			JSONObject obj = JSONObject.fromObject(entry.getValue());
-//			String modelId = (String) obj.get("model");
-//			String url = modelId.substring(0, modelId.lastIndexOf("_model")) + "s";
-//			String serviceUrl = url;
-//			String str = "$app.model('" + modelId + "', {url:'" + serviceUrl + "'});\n";
-//			str += "var metadata_" + id + " = " + metadata + ";" + BR;
 			String replaceStr = "$app.metadata('" + id + "', " + JsonFormatTool.formatJson(entry.getValue(), "\t") + "\n);\n";
 			modelStr = WtfStringUtils.replaceString(index, endIndex, modelStr, replaceStr);
 		}
@@ -338,14 +330,6 @@ public class ApplicationUpdateHelper {
 		}
 	}
 	
-//	private static String getStartString(String id, String type) {
-//		return "/*\n* definition of" + type + ":" + id + "\n*/";
-//	}
-//
-//	private static String getEndString() {
-//		return "/*\n* definition end\n*/";
-//	}
-	
 	private static void updateFile(String path, String str) {
 		try {
 			FileUtils.writeStringToFile(new File(path), str);
@@ -356,31 +340,4 @@ public class ApplicationUpdateHelper {
 			throw new RuntimeException(e.getMessage(), e);
 		}
 	}
-	
-
-//	private static String updateString(String id, String fullCodes, int start, int end, String updateStr, String sign) {
-//		return fullCodes.substring(0, start) + BR + generateCodes(id, updateStr, sign) + BR + fullCodes.substring(end);
-//	}
-
-//	private static String addToString(String id, String fullCodes, String metadata, String sign) {
-//		int lastIndex = fullCodes.lastIndexOf("}");
-//		fullCodes = fullCodes.substring(0, lastIndex) + BR + getStartString(id, sign) + BR + generateCodes(id, metadata, sign) + BR + getEndString() + BR + fullCodes.substring(lastIndex);
-//		return fullCodes;
-//	}
-
-
-//	private static String generateCodes(String id, String metadata, String sign) {
-//		if(sign.equals("metadata")){
-//			JSONObject obj = JSONObject.fromObject(metadata);
-//			String modelId = (String) obj.get("model");
-//			String url = modelId.substring(0, modelId.lastIndexOf("_model")) + "s";
-//			String serviceUrl = url;
-//			String str = "$app.model('" + modelId + "', {url:'" + serviceUrl + "'});\n";
-////			str += "var metadata_" + id + " = " + metadata + ";" + BR;
-//			return str + "$app.metadata('" + id + "', " + JsonFormatTool.formatJson(metadata, "\t") + "\n);";
-//		}
-//		else{
-//			return TAB + JsonFormatTool.formatJson(metadata, "\t");
-//		}
-//	}
 }
