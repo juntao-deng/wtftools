@@ -273,16 +273,21 @@ public class ApplicationUpdateHelper {
 	private static void processNode(Node node) {
 		NodeList cList = node.getChildren();
 		if(node instanceof Div && ((Div)node).getAttribute("wtftype") != null && (!((Div)node).getAttribute("wtftype").equals("container"))){
-			NodeList newCList = new NodeList();
-			if(cList != null){
-				SimpleNodeIterator it = cList.elements();
-				while(it.hasMoreNodes()){
-					Node cNode = it.nextNode();
-					processForPos(newCList, cNode);
-					
-				}
+			if(((Div)node).getAttribute("wtftype").equals("tab") || ((Div)node).getAttribute("wtftype").equals("card")){
+				processTab(node);
 			}
-			node.setChildren(newCList);
+			else{
+				NodeList newCList = new NodeList();
+				if(cList != null){
+					SimpleNodeIterator it = cList.elements();
+					while(it.hasMoreNodes()){
+						Node cNode = it.nextNode();
+						processForPos(newCList, cNode);
+						
+					}
+				}
+				node.setChildren(newCList);
+			}
 			cList = null;
 		}
 		
@@ -306,6 +311,10 @@ public class ApplicationUpdateHelper {
 				processNode(cNode);
 			}
 		}
+	}
+
+	private static void processTab(Node node) {
+		
 	}
 
 	private static void processForPos(NodeList newCList, Node cNode) {
