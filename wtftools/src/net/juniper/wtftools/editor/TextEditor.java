@@ -21,7 +21,7 @@ public class TextEditor {
 	private Text text;
 	private Composite editorParent;
 	private AbstractDecoratedTextEditor editor;
-	private boolean changed = false;
+//	private boolean changed = false;
 	public TextEditor(Composite parent, EditorType type) {
 		editorParent = new Composite(parent, SWT.NONE);
 		editorParent.setLayout(new FillLayout(SWT.HORIZONTAL));

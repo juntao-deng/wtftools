@@ -22,7 +22,6 @@ import org.eclipse.swt.widgets.Display;
 import org.htmlparser.Node;
 import org.htmlparser.Parser;
 import org.htmlparser.nodes.TextNode;
-import org.htmlparser.tags.Div;
 import org.htmlparser.util.NodeList;
 import org.htmlparser.util.ParserException;
 import org.htmlparser.util.SimpleNodeIterator;
@@ -30,7 +29,7 @@ import org.htmlparser.util.SimpleNodeIterator;
 public class ApplicationUpdateHelper {
 	private static final String BR = "\n";
 	private static final String TAB = "\t";
-
+	private static WtfElementProcessor wtfProcess = new WtfElementProcessor();
 	public static void updateModel(IPath appPath, Map<String, String> modelMap) {
 		String metadataPath = appPath.append("model.js").toOSString();
 		String modelStr = getFile(metadataPath);
@@ -219,7 +218,7 @@ public class ApplicationUpdateHelper {
 				SimpleNodeIterator it = cList.elements();
 				while(it.hasMoreNodes()){
 					Node node = it.nextNode();
-					processNode(node);
+					wtfProcess.process(node);
 				}
 				dumpWithFormat(cList.elementAt(0), "", TAB);
 				return cList.elementAt(0).toHtml();
@@ -270,75 +269,79 @@ public class ApplicationUpdateHelper {
 	}
 
 
-	private static void processNode(Node node) {
-		NodeList cList = node.getChildren();
-		if(node instanceof Div && ((Div)node).getAttribute("wtftype") != null && (!((Div)node).getAttribute("wtftype").equals("container"))){
-			if(((Div)node).getAttribute("wtftype").equals("tab") || ((Div)node).getAttribute("wtftype").equals("card")){
-				processTab(node);
-			}
-			else{
-				NodeList newCList = new NodeList();
-				if(cList != null){
-					SimpleNodeIterator it = cList.elements();
-					while(it.hasMoreNodes()){
-						Node cNode = it.nextNode();
-						processForPos(newCList, cNode);
-						
-					}
-				}
-				node.setChildren(newCList);
-			}
-			cList = null;
-		}
-		
-		if(node instanceof Div){
-			((Div) node).removeAttribute("wtfdone");
-			((Div) node).removeAttribute("designable");
-			String className = ((Div) node).getAttribute("class");
-			if(className != null && className.contains(" designele_sign")){
-				className = className.replace(" designele_sign", "");
-			}
-			if(className != null && className.contains(" designele")){
-				className = className.replace(" designele", "");
-			}
-			if(className != null)
-				((Div) node).setAttribute("class", className);
-		}
-		if(cList != null){
-			SimpleNodeIterator it = cList.elements();
-			while(it.hasMoreNodes()){
-				Node cNode = it.nextNode();
-				processNode(cNode);
-			}
-		}
-	}
-
-	private static void processTab(Node node) {
-		
-	}
-
-	private static void processForPos(NodeList newCList, Node cNode) {
-		NodeList ccNodeList = cNode.getChildren();
-		if(cNode instanceof Div && ((Div)cNode).getAttribute("wtfpos") != null){
-			if(ccNodeList != null){
-				SimpleNodeIterator it = ccNodeList.elements();
-				while(it.hasMoreNodes()){
-					Node ccNode = it.nextNode();
-					processNode(ccNode);
-				}
-				newCList.add(ccNodeList);
-			}
-		}
-		else{
-			if(ccNodeList != null){
-				SimpleNodeIterator it = ccNodeList.elements();
-				while(it.hasMoreNodes()){
-					Node ccNode = it.nextNode();
-					processForPos(newCList, ccNode);
-				}
-			}
-		}
-	}
+//	private static void processNode(Node node) {
+//		NodeList cList = node.getChildren();
+//		if(node instanceof Div){
+//			String wtftype = ((Div)node).getAttribute("wtftype");
+//			if(wtftype != null && !wtftype.equals("container")){
+//				if(wtftype.equals("tab") || wtftype.equals("card")){
+//					.process(node);
+//				}
+//				else{
+//					//clean children, except for wtfpos
+//					NodeList newCList = new NodeList();
+//					if(cList != null){
+//						SimpleNodeIterator it = cList.elements();
+//						while(it.hasMoreNodes()){
+//							Node cNode = it.nextNode();
+//							processForPos(newCList, cNode);
+//						}
+//					}
+//					node.setChildren(newCList);
+//				}
+//				cList = null;
+//			}
+//			
+//			//clean runtime sign
+//			((Div) node).removeAttribute("wtfdone");
+//			((Div) node).removeAttribute("designable");
+//			
+//			String className = ((Div) node).getAttribute("class");
+//			if(className != null && className.contains(" designele_sign")){
+//				className = className.replace(" designele_sign", "");
+//			}
+//			if(className != null && className.contains(" designele")){
+//				className = className.replace(" designele", "");
+//			}
+//			if(className != null && !className.equals(""))
+//				((Div) node).setAttribute("class", className);
+//			else
+//				((Div) node).removeAttribute("class");
+//		}
+//		
+//		if(cList != null){
+//			SimpleNodeIterator it = cList.elements();
+//			while(it.hasMoreNodes()){
+//				Node cNode = it.nextNode();
+//				processNode(cNode);
+//			}
+//		}
+//	}
+//
+//	
+//
+//	private static void processForPos(NodeList newCList, Node cNode) {
+//		NodeList ccNodeList = cNode.getChildren();
+//		if(cNode instanceof Div && ((Div)cNode).getAttribute("wtfpos") != null){
+//			if(ccNodeList != null){
+//				SimpleNodeIterator it = ccNodeList.elements();
+//				while(it.hasMoreNodes()){
+//					Node ccNode = it.nextNode();
+//					processNode(ccNode);
+//				}
+//				newCList.add(ccNodeList);
+//			}
+//		}
+//		else{
+//			if(ccNodeList != null){
+//				SimpleNodeIterator it = ccNodeList.elements();
+//				while(it.hasMoreNodes()){
+//					Node ccNode = it.nextNode();
+//					processForPos(newCList, ccNode);
+//				}
+//			}
+//		}
+//	}
 
 
 	private static String updateMetadata(String modelStr, Map<String, String> metadataMap) {
