@@ -21,19 +21,12 @@ public class WtfNewProjectPage2 extends WizardPage implements  IPropertyChangeLi
  {
 	public static String lfwprojectPath;
 	private boolean fInited = false;
-//	public static String context;
-	//public static String docname;
 	public static IProject project;
 	private StringDialogField contextPath;
-//	private checkb
-	//private StringDialogField docNameNode;
-//	private DirectoryFieldEditor docbasePath;
 	private SelectionButtonDialogField homePageField;
-	
 	private SelectionButtonDialogField jpaConfigField;
 	
-	private StringDialogField createStringDialogField(String labeltext, Composite parent)
-	{
+	private StringDialogField createStringDialogField(String labeltext, Composite parent){
 		StringDialogField field = new StringDialogField();
 		field.setLabelText(labeltext);
 		field.doFillIntoGrid(parent, 2);
@@ -65,59 +58,22 @@ public class WtfNewProjectPage2 extends WizardPage implements  IPropertyChangeLi
 	public void setFInited(boolean inited) {
 		fInited = inited;
 	}
-
-
-//	public DirectoryFieldEditor getDocbasePath() {
-//		return docbasePath;
-//	}
-//
-//
-//
-//
-//	public void setDocbasePath(DirectoryFieldEditor docbasePath) {
-//		this.docbasePath = docbasePath;
-//	}
-
-//	private String docbase;
-//	
-//	public String getDocbase() {
-//		return docbasePath.getStringValue();
-//	}
-//
-//	public void setDocbase(String docbase) {
-//		this.docbase = docbase;
-//	}
-
 	
-//	public static void setDocnmae(String docname){
-//		NewModuleWebContextPage.docname = docname;
-//	}
-//	
 	public  String getContext() {
 		return contextPath.getText();
 	}
 
-
-//	public StringDialogField getContextPath() {
-//		return contextPath;
-//	}
-
-//	public void setContextPath(StringDialogField contextPath) {
-//		this.contextPath = contextPath;
-//	}
-
 	public void setContext(String context) {
 		contextPath.setText(context);
 	}
-
-
-//	public SelectionButtonDialogField getIsPortalProject() {
-//		return isPortalProject;
-//	}
-//
-//	public void setIsPortalProject(SelectionButtonDialogField isPortalProject) {
-//		this.isPortalProject = isPortalProject;
-//	}
+	
+	public boolean isWithHome(){
+		return homePageField.isSelected();
+	}
+	
+	public boolean isWithJpa() {
+		return jpaConfigField.isSelected();
+	}
 
 	public void createControl(Composite parent){
 		final Composite composite = new Composite(parent, SWT.NULL);
@@ -126,18 +82,15 @@ public class WtfNewProjectPage2 extends WizardPage implements  IPropertyChangeLi
 		contextPath = createStringDialogField("Context Path", composite);
 		
 		homePageField = createCheckBoxField("With Home Page", composite);
+		homePageField.setSelection(true);
 		
 		jpaConfigField = createCheckBoxField("Jpa Configuration", composite);
+		jpaConfigField.setSelection(true);
 		
 		setControl(composite);
 		fInited = true;
 	}
 
-	
-//	private String getCurrentLFWPath(){
-//		return lfwprojectPath + "/web";
-//	}
-	
 	protected GridLayout initGridLayout(GridLayout layout, boolean margins){
 		layout.horizontalSpacing = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_SPACING);
 		layout.verticalSpacing = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_SPACING);
@@ -155,24 +108,6 @@ public class WtfNewProjectPage2 extends WizardPage implements  IPropertyChangeLi
 	}
 
 	private void validate(){
-//		if(contextPath != null){
-//			setContext(contextPath.getText());
-//			if(getContext().equals("")){
-//				//setErrorMessage("Context不能为空");
-//				setPageComplete(false);
-//				//return false;
-//			}
-//			Pattern pattern = Pattern.compile("[!@~#$%^&*-+]+");//just test
-//			if(pattern.matcher(getContext().trim()).find())
-//			{
-//				//setErrorMessage("Context中请不要包含: ! @ ~ # $ % ^ & * - + 等特殊符号!");
-//				setPageComplete(false);
-//				//return false;
-//			}
-//			
-//		}
-//		setPageComplete(true);
-		//return true;
 	}
 
 	public boolean isPageComplete(){

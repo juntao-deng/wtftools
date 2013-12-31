@@ -22,18 +22,14 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
 
-public class WtfNewProjectCreationOperation extends WorkspaceModifyOperation
-{
+public class WtfNewProjectCreationOperation extends WorkspaceModifyOperation{
 	IProjectProvider projectProvider;
 
-	public WtfNewProjectCreationOperation(IProjectProvider provider)
-	{
+	public WtfNewProjectCreationOperation(IProjectProvider provider){
 		this.projectProvider = provider;
-		
 	}
 
-	protected void execute(IProgressMonitor monitor) throws CoreException, InvocationTargetException, InterruptedException
-	{
+	protected void execute(IProgressMonitor monitor) throws CoreException, InvocationTargetException, InterruptedException{
 		monitor.beginTask("Creating Project...", 5);
 		monitor.subTask("Creating Project");
 		IProject project = createProject();
@@ -48,15 +44,13 @@ public class WtfNewProjectCreationOperation extends WorkspaceModifyOperation
 		
 		project.refreshLocal(IProject.DEPTH_INFINITE, monitor);
 	}
-	
-
 
 	private void addApplicationFiles(IProject project) {
 		writeWebConfig(project);
-		if(true){
+		if(projectProvider.isWithJpa()){
 			writeJpaConfig(project);
 		}
-		if(true){
+		if(projectProvider.isWithHome()){
 			copyHomeApplication(project);
 		}
 	}
@@ -66,9 +60,9 @@ public class WtfNewProjectCreationOperation extends WorkspaceModifyOperation
 		try {
 			String projectPath = project.getLocation().toOSString();
 			FileUtils.copyDirectory(new File(webLocation + "/init/copy/WEB-INF"), new File(projectPath + "/web/WEB-INF"));
-			if(true/*with home*/)
+			if(projectProvider.isWithHome())
 				FileUtils.copyDirectory(new File(webLocation + "/init/copy/src"), new File(projectPath + "/src"));
-			if(true/*with jpa*/)
+			if(projectProvider.isWithJpa())
 				FileUtils.copyDirectory(new File(webLocation + "/init/copy/jpares"), new File(projectPath + "/src/resources"));
 		} 
 		catch (IOException e) {
