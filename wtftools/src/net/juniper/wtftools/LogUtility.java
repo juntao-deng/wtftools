@@ -6,7 +6,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-
+/**
+ * Log Utility for eclipse plugin
+ * @author Juntao
+ *
+ */
 public class LogUtility {
 	private ILog log;
 	private String pluginId;
@@ -15,19 +19,16 @@ public class LogUtility {
 		this.pluginId = pluginId;
 	}
 	
-	private void log(IStatus status)
-	{
+	private void log(IStatus status){
 		log.log(status);
 	}
 
-	public void logErrorMessage(String message)
-	{
+	public void logErrorMessage(String message){
 		log(new Status(IStatus.ERROR, getPluginId(), IStatus.ERROR, message, null));
 	}
 
 
-	public void logInfoMessage(String message)
-	{
+	public void logInfoMessage(String message){
 		log(new Status(IStatus.INFO, getPluginId(), IStatus.INFO, message, null));
 	}
 
@@ -41,8 +42,8 @@ public class LogUtility {
 			status = new Status(IStatus.ERROR, getPluginId(), IStatus.OK, msg, e);
 		log(status);
 	}
-	public void log(Throwable e)
-	{
+	
+	public void log(Throwable e){
 		log(e.getMessage(), e);
 	}
 	

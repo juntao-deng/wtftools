@@ -35,7 +35,7 @@ public class WtfProjectNewWizard extends Wizard implements INewWizard {
 	/**
 	 * Adding the page to the wizard.
 	 */
-
+	@Override
 	public void addPages() {
 		page1 = new WtfNewProjectPage1(selection);
 		addPage(page1);
@@ -49,19 +49,20 @@ public class WtfProjectNewWizard extends Wizard implements INewWizard {
 	 * the wizard. We will create an operation and run it
 	 * using wizard as execution context.
 	 */
+	@Override
 	public boolean performFinish() {
 		// BasicNewProjectResourceWizard.updatePerspective(fConfig);
         try {
         	projectProvider = new IProjectProvider() {
-                
+        		@Override
                 public String getProjectName() {
                     return page1.getProjectName();
                 }
-
+        		@Override
                 public IProject getProject() {
                     return page1.getProjectHandle();
                 }
-
+        		@Override
                 public IPath getLocationPath() {
                     return page1.getLocationPath();
                 }
@@ -105,6 +106,7 @@ public class WtfProjectNewWizard extends Wizard implements INewWizard {
 	 * we can initialize from it.
 	 * @see IWorkbenchWizard#init(IWorkbench, IStructuredSelection)
 	 */
+	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
 		this.selection = selection;
 	}

@@ -17,8 +17,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
-public class WtfNewProjectPage2 extends WizardPage implements  IPropertyChangeListener, IDialogFieldListener
- {
+@SuppressWarnings("restriction")
+public class WtfNewProjectPage2 extends WizardPage implements  IPropertyChangeListener, IDialogFieldListener{
 	public static String lfwprojectPath;
 	private boolean fInited = false;
 	public static IProject project;
@@ -35,8 +35,7 @@ public class WtfNewProjectPage2 extends WizardPage implements  IPropertyChangeLi
 		return field;
 	}
 	
-	private SelectionButtonDialogField createCheckBoxField(String labeltext, Composite parent)
-	{
+	private SelectionButtonDialogField createCheckBoxField(String labeltext, Composite parent){
 		SelectionButtonDialogField field = new SelectionButtonDialogField(SWT.CHECK);
 		field.setLabelText(labeltext);
 		field.doFillIntoGrid(parent, 2);
@@ -75,6 +74,7 @@ public class WtfNewProjectPage2 extends WizardPage implements  IPropertyChangeLi
 		return jpaConfigField.isSelected();
 	}
 
+	@Override
 	public void createControl(Composite parent){
 		final Composite composite = new Composite(parent, SWT.NULL);
 		composite.setLayout(initGridLayout(new GridLayout(2, false), true));
@@ -110,6 +110,7 @@ public class WtfNewProjectPage2 extends WizardPage implements  IPropertyChangeLi
 	private void validate(){
 	}
 
+	@Override
 	public boolean isPageComplete(){
 		if(contextPath != null && contextPath.getText() != null){
 			setContext(contextPath.getText());
@@ -126,10 +127,12 @@ public class WtfNewProjectPage2 extends WizardPage implements  IPropertyChangeLi
 		return true;
 	}
 
+	@Override
 	public void propertyChange(PropertyChangeEvent event) {
 		validate();
 	}
 
+	@Override
 	public void dialogFieldChanged(DialogField field) {
 		validate();
 	}

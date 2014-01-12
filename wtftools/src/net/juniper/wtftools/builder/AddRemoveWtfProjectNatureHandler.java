@@ -1,7 +1,10 @@
 package net.juniper.wtftools.builder;
 
 import java.util.Iterator;
-import org.eclipse.core.commands.*;
+
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
@@ -9,33 +12,31 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
-
+/**
+ * Toggle nature for wtf project
+ * @author Juntao
+ *
+ */
 public class AddRemoveWtfProjectNatureHandler extends AbstractHandler {
-
-	private ISelection selection;
-
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		// TODO Auto-generated method stub
 		ISelection selection = HandlerUtil.getCurrentSelection(event);
 		//
 		if (selection instanceof IStructuredSelection) {
-			for (Iterator<?> it = ((IStructuredSelection) selection).iterator(); it
-					.hasNext();) {
+			for (Iterator<?> it = ((IStructuredSelection) selection).iterator(); it.hasNext();) {
 				Object element = it.next();
 				IProject project = null;
 				if (element instanceof IProject) {
 					project = (IProject) element;
-				} else if (element instanceof IAdaptable) {
-					project = (IProject) ((IAdaptable) element)
-							.getAdapter(IProject.class);
+				} 
+				else if (element instanceof IAdaptable) {
+					project = (IProject) ((IAdaptable) element).getAdapter(IProject.class);
 				}
 				if (project != null) {
 					try {
 						toggleNature(project);
-					} catch (CoreException e) {
-						//TODO log something
-						throw new ExecutionException("Failed to toggle nature",
-								e);
+					} 
+					catch (CoreException e) {
+						throw new ExecutionException("Failed to toggle nature", e);
 					}
 				}
 			}

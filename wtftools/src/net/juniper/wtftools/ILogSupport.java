@@ -1,5 +1,9 @@
 package net.juniper.wtftools;
-
+/**
+ * 
+ * @author Juntao
+ *
+ */
 public interface ILogSupport {
 	public void logInfo(String msg);
 	public void logError(String msg);

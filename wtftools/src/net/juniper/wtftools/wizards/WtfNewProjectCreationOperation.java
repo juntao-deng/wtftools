@@ -29,14 +29,13 @@ public class WtfNewProjectCreationOperation extends WorkspaceModifyOperation{
 		this.projectProvider = provider;
 	}
 
+	@Override
 	protected void execute(IProgressMonitor monitor) throws CoreException, InvocationTargetException, InterruptedException{
 		monitor.beginTask("Creating Project...", 5);
 		monitor.subTask("Creating Project");
 		IProject project = createProject();
 		monitor.worked(1);
 
-		writeConfigFiles(project);
-		
 		monitor.subTask("Updating project's classpath...");
 		computeInitClasspath(project, monitor);
 		addApplicationFiles(project);
@@ -46,24 +45,16 @@ public class WtfNewProjectCreationOperation extends WorkspaceModifyOperation{
 	}
 
 	private void addApplicationFiles(IProject project) {
-		writeWebConfig(project);
-		if(projectProvider.isWithJpa()){
-			writeJpaConfig(project);
-		}
-		if(projectProvider.isWithHome()){
-			copyHomeApplication(project);
-		}
-	}
-
-	private void writeWebConfig(IProject project) {
 		String webLocation = WtfProjectCommonTools.getFrameworkWebLocation();
 		try {
 			String projectPath = project.getLocation().toOSString();
 			FileUtils.copyDirectory(new File(webLocation + "/init/copy/WEB-INF"), new File(projectPath + "/web/WEB-INF"));
-			if(projectProvider.isWithHome())
+			if(projectProvider.isWithHome()){
+				copyHomeApplication(project);
 				FileUtils.copyDirectory(new File(webLocation + "/init/copy/src"), new File(projectPath + "/src"));
+			}
 			if(projectProvider.isWithJpa())
-				FileUtils.copyDirectory(new File(webLocation + "/init/copy/jpares"), new File(projectPath + "/src/resources"));
+				FileUtils.copyDirectory(new File(webLocation + "/init/copy/jpares"), new File(projectPath + "/resources"));
 		} 
 		catch (IOException e) {
 			WtfToolsActivator.getDefault().logError(e);
@@ -76,10 +67,12 @@ public class WtfNewProjectCreationOperation extends WorkspaceModifyOperation{
 			String projectPath = project.getLocation().toOSString();
 			String projectLocation = projectPath + "/web/";
 			FileUtils.copyFile(new File(fwLocation + "index.html"), new File(projectLocation + "index.html"));
-			FileUtils.copyFile(new File(fwLocation + "rest/homeinfos.js"), new File(projectLocation + "rest/homeinfos.js"));
-			FileUtils.copyFile(new File(fwLocation + "rest/dashboard.js"), new File(projectLocation + "rest/dashboard.js"));
-			FileUtils.copyDirectory(new File(fwLocation + "applications/home"), new File(projectLocation + "applications/home"));
-			FileUtils.copyDirectory(new File(fwLocation + "applications/dashboard"), new File(projectLocation + "applications/dashboard"));
+//			FileUtils.copyFile(new File(fwLocation + "rest/homeinfos.js"), new File(projectLocation + "rest/homeinfos.js"));
+//			FileUtils.copyFile(new File(fwLocation + "rest/dashboard.js"), new File(projectLocation + "rest/dashboard.js"));
+			FileUtils.copyDirectory(new File(fwLocation + "applications"), new File(projectLocation + "applications"));
+			FileUtils.copyDirectory(new File(fwLocation + "widgets"), new File(projectLocation + "widgets"));
+			FileUtils.copyDirectory(new File(fwLocation + "templates"), new File(projectLocation + "templates"));
+			FileUtils.copyDirectory(new File(fwLocation + "rest"), new File(projectLocation + "rest"));//			FileUtils.copyDirectory(new File(fwLocation + "applications/dashboard"), new File(projectLocation + "applications/dashboard"));
 			FileUtils.copyDirectory(new File(fwLocation + "configuration"), new File(projectLocation + "configuration"));
 			updateFileContent(fwLocation, projectLocation);
 		} 
@@ -111,23 +104,16 @@ public class WtfNewProjectCreationOperation extends WorkspaceModifyOperation{
 		}
 	}
 
-	private void writeJpaConfig(IProject project) {
-		
-	}
+//	private void writeJpaConfig(IProject project) {
+//		
+//	}
+//
+//	private void writeTomcatConfig(IProject project) {
+//		TomcatHelper.writeConfigFile(project.getLocation().toOSString(), projectProvider.getContext());
+//		TomcatHelper.writeContextFile(projectProvider.getContext(), project.getFullPath().append("web").toString());
+//	}
 
-	private void writeConfigFiles(IProject project) {
-		if(WtfProjectCommonTools.isTomcat()){
-			writeTomcatConfig(project);
-		}
-	}
-
-	private void writeTomcatConfig(IProject project) {
-		TomcatHelper.writeConfigFile(project.getLocation().toOSString(), projectProvider.getContext());
-		TomcatHelper.writeContextFile(projectProvider.getContext(), project.getFullPath().append("web").toString());
-	}
-
-	private IProject createProject() throws CoreException
-	{
+	private IProject createProject() throws CoreException{
 		IProject project = projectProvider.getProject();
 		if (!project.exists()){
 			ProjCoreUtility.createProject(project, projectProvider.getLocationPath(), null);
@@ -136,9 +122,6 @@ public class WtfNewProjectCreationOperation extends WorkspaceModifyOperation{
 		List<String> natures = new ArrayList<String>();
 		natures.add(JavaCore.NATURE_ID);
 		natures.add(WtfToolsConstants.WTF_NATURE_ID);
-		if(WtfProjectCommonTools.isTomcat()){
-			natures.add(WtfToolsConstants.TOMCAT_NATURE_ID);
-		}
 		
 		ProjCoreUtility.addNatureToProject(project, natures.toArray(new String[0]), null);
 		return project;
@@ -147,10 +130,12 @@ public class WtfNewProjectCreationOperation extends WorkspaceModifyOperation{
 	private void computeInitClasspath(IProject project, IProgressMonitor monitor) throws CoreException{
 		IJavaProject javaProject = JavaCore.create(project);
 		List<IClasspathEntry> list = new ArrayList<IClasspathEntry>();
-		list.add(ProjCoreUtility.createSourceEntry(project, "src/restapis"));
-		list.add(ProjCoreUtility.createSourceEntry(project, "src/services"));
-		list.add(ProjCoreUtility.createSourceEntry(project, "src/implements"));
-		list.add(ProjCoreUtility.createSourceEntry(project, "src/resources"));
+		list.add(ProjCoreUtility.createSourceEntry(project, "src"));
+		list.add(ProjCoreUtility.createSourceEntry(project, "resources"));
+//		list.add(ProjCoreUtility.createSourceEntry(project, "src/restapis"));
+//		list.add(ProjCoreUtility.createSourceEntry(project, "src/services"));
+//		list.add(ProjCoreUtility.createSourceEntry(project, "src/implements"));
+//		list.add(ProjCoreUtility.createSourceEntry(project, "src/resources"));
 		javaProject.setRawClasspath(list.toArray(new IClasspathEntry[0]), null);
 		
 		IFolder folder = project.getFolder("web");
@@ -161,6 +146,12 @@ public class WtfNewProjectCreationOperation extends WorkspaceModifyOperation{
 		
 		IFolder rest = project.getFolder("web/rest");
 		ProjCoreUtility.createFolder(rest);
+		
+		IFolder widgets = project.getFolder("web/widgets");
+		ProjCoreUtility.createFolder(widgets);
+		
+		IFolder templates = project.getFolder("web/templates");
+		ProjCoreUtility.createFolder(templates);
 
 		ClasspathComputer.updateClasspath(project, monitor);
 	}

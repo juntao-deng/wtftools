@@ -30,7 +30,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Group;
 
+@SuppressWarnings("restriction")
 public class WtfNewProjectPage1 extends WizardPage{
+	private NameGroup fNameGroup;
+	private LocationGroup fLocationGroup;
+	private String fInitialName;
+	
 	private final class NameGroup extends Observable implements IDialogFieldListener{
 		protected final StringDialogField fNameField;
 
@@ -65,6 +70,7 @@ public class WtfNewProjectPage1 extends WizardPage{
 			fNameField.setText(name);
 		}
 
+		@Override
 		public void dialogFieldChanged(DialogField field){
 			validatePage();
 			fireEvent();
@@ -112,6 +118,7 @@ public class WtfNewProjectPage1 extends WizardPage{
 			return path.toOSString();
 		}
 
+		@Override
 		public void update(Observable o, Object arg){
 			if (isInWorkspace()){
 				fLocation.setText(getDefaultPath(fNameGroup.getName()));
@@ -131,6 +138,7 @@ public class WtfNewProjectPage1 extends WizardPage{
 			return fWorkspaceRadio.isSelected();
 		}
 
+		@Override
 		public void changeControlPressed(DialogField field){
 			final DirectoryDialog dialog = new DirectoryDialog(getShell());
 			dialog.setMessage("Choose a directory for the project contents:");
@@ -155,82 +163,21 @@ public class WtfNewProjectPage1 extends WizardPage{
 			}
 		}
 
+		@Override
 		public void dialogFieldChanged(DialogField field){
 			validatePage();
 			fireEvent();
 		}
 	}
 
-//	private final class ModuleInfoGroup extends Observable implements IDialogFieldListener
-//	{
-//		protected final StringDialogField fModuleName;
-//		protected final StringDialogField fModuleConfig;
-//
-//		//        protected final StringDialogField fModuleDesc;
-//		//        protected final StringDialogField fModulePriority;
-//		public ModuleInfoGroup(Composite composite)
-//		{
-//			final int numColumns = 4;
-//			final Group group = new Group(composite, SWT.NONE);
-//			group.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-//			group.setLayout(initGridLayout(new GridLayout(numColumns, false), true));
-//			//group.setText(WEBProjPlugin.getResourceString(WEBProjConstants.KEY_MODULE_GROUP));
-//			fModuleName = null;//createDialogField(WEBProjPlugin.getResourceString(WEBProjConstants.KEY_MODULE_NAME), fInitialName, numColumns, group);
-//			fModuleConfig = null;//createDialogField(WEBProjPlugin.getResourceString(WEBProjConstants.KEY_MODULE_CONFIG), "module.xml", numColumns, group);
-//			//            fModulePriority = createDialogField(MDEPlugin.getResourceString(KEY_MODULE_PRIORITY), "30", numColumns, group);
-//			//            fModuleDesc = new StringDialogField();
-//			//            fModuleDesc.setLabelText(MDEPlugin.getResourceString(KEY_MODULE_DESC));
-//			//            fModuleDesc.doFillIntoGrid(group, numColumns);
-//			//            LayoutUtil.setHorizontalGrabbing(fModuleDesc.getTextControl(null));
-//		}
-//
-//		private StringDialogField createDialogField(String label, String defValue, final int numColumns, final Group group)
-//		{
-//			StringDialogField field = new StringDialogField();
-//			field.setLabelText(label);
-//			field.setText(defValue);
-//			field.setDialogFieldListener(this);
-//			field.doFillIntoGrid(group, numColumns);
-//			LayoutUtil.setHorizontalGrabbing(field.getTextControl(null));
-//			return field;
-//		}
-//
-//		public String getModuleName()
-//		{
-//			return fModuleName.getText().trim();
-//		}
-//
-//		//        public String getModuleDesc() {
-//		//            return fModuleDesc.getText().trim();
-//		//        }
-//		//        public int getPriority() {
-//		//            return Integer.parseInt(fModulePriority.getText().trim());
-//		//        }
-//		public String getModuleConfig()
-//		{
-//			return fModuleConfig.getText().trim();
-//		}
-//
-//		public void dialogFieldChanged(DialogField field)
-//		{
-//			validatePage();
-//		}
-//	}
-
-	private NameGroup fNameGroup;
-	private LocationGroup fLocationGroup;
-//	private ModuleInfoGroup fModuleInfoGroup;
-	private String fInitialName;
-//	private boolean fInited = false;
-
-	public WtfNewProjectPage1(ISelection selection)
-	{
+	public WtfNewProjectPage1(ISelection selection){
 		super("Wtf Project Wizard");
 		setTitle("Create a Wtf Project");
 		setDescription("Information about the project to be created"); //
 		fInitialName = "";
 	}
 	
+	@Override
 	public IWizardPage getNextPage() {
 		WtfNewProjectPage2 nextpage = (WtfNewProjectPage2) super.getNextPage();
 		if(nextpage.getContext() == null || nextpage.getContext().equals("")){
@@ -239,8 +186,8 @@ public class WtfNewProjectPage1 extends WizardPage{
 		return nextpage;
 	}
 	
-	public void createControl(Composite parent)
-	{
+	@Override
+	public void createControl(Composite parent){
 		initializeDialogUnits(parent);
 		final Composite composite = new Composite(parent, SWT.NULL);
 		composite.setFont(parent.getFont());
@@ -248,166 +195,51 @@ public class WtfNewProjectPage1 extends WizardPage{
 		composite.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL));
 		fNameGroup = new NameGroup(composite, fInitialName);
 		fLocationGroup = new LocationGroup(composite);
-//		fModuleInfoGroup = new ModuleInfoGroup(composite);
 		fNameGroup.addObserver(fLocationGroup);
 		fNameGroup.notifyObservers();
 		setControl(composite);
 		Dialog.applyDialogFont(composite);
 	}
 
-	protected GridLayout initGridLayout(GridLayout layout, boolean margins)
-	{
+	protected GridLayout initGridLayout(GridLayout layout, boolean margins){
 		layout.horizontalSpacing = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_SPACING);
 		layout.verticalSpacing = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_SPACING);
-		if (margins)
-		{
+		if (margins){
 			layout.marginWidth = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_MARGIN);
 			layout.marginHeight = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_MARGIN);
 		}
-		else
-		{
+		else{
 			layout.marginWidth = 0;
 			layout.marginHeight = 0;
 		}
 		return layout;
 	}
 
-	public IPath getLocationPath()
-	{
+	public IPath getLocationPath(){
 		return fLocationGroup.getLocation();
 	}
 
-	public IProject getProjectHandle()
-	{
+	public IProject getProjectHandle(){
 		return ResourcesPlugin.getWorkspace().getRoot().getProject(fNameGroup.getName());
 	}
 
-	public boolean isInWorkspace()
-	{
+	public boolean isInWorkspace(){
 		return fLocationGroup.isInWorkspace();
 	}
 
-	public String getProjectName()
-	{
+	public String getProjectName(){
 		return fNameGroup.getName();
 	}
-
-	public void setVisible(boolean visible)
-	{
+	
+	@Override
+	public void setVisible(boolean visible){
 		super.setVisible(visible);
-		if (visible)
-		{
+		if (visible){
 			fNameGroup.postSetFocus();
 		}
 	}
 
-//	public String getModuleName()
-//	{
-//		return fModuleInfoGroup.getModuleName();
-//	}
-//
-//	//    public String getModuleDesc() {
-//	//        return fModuleInfoGroup.getModuleDesc();
-//	//    }
-//	public String getModuleConfig()
-//	{
-//		return fModuleInfoGroup.getModuleConfig();
-//	}
-
-	protected boolean validatePage()
-	{
-//		if (fInited)
-//		{
-//			boolean vlidProjectName = validateName(getProjectName(), "Project name must be specified", null);
-//			if (!vlidProjectName)
-//			{
-//				setPageComplete(false);
-//				return false;
-//			}
-//			IPath path = new Path("");
-//			if (!path.isValidPath(getLocationPath().toString()))
-//			{
-//				setErrorMessage("Invalid project contents directory"); //$NON-NLS-1$
-//				setPageComplete(false);
-//				return false;
-//			}
-//			boolean validModuleName = validateName(getModuleName(), "Module name can't be null", "Module name must composed by valid characters");
-//			if (!validModuleName)
-//			{
-//				setPageComplete(false);
-//				return false;
-//			}
-//			//            try {
-//			//                getPriority();
-//			//                setErrorMessage(null);
-//			//            } catch(Throwable thr) {
-//			//                setErrorMessage("Module Priority must be integer");
-//			//                setMessage(null);
-//			//                setPageComplete(false);
-//			//                return false;
-//			//            }
-//			String moduleConfig = getModuleConfig();
-//			if (moduleConfig != null)
-//			{
-//				if (!"module.xml".equals(moduleConfig))
-//				{
-//					String extension = ProjCoreUtility.getExtension(moduleConfig);
-//					if (!"module".equals(extension))
-//					{
-//						setPageComplete(false);
-//						setErrorMessage("Module config must with extension '.module' or as name 'module.xml'");
-//						return false;
-//					}
-//					else
-//					{
-//						boolean validConfigName = validateName(getModuleName(), "Module Config Name can't be null", "Module Config name must composed by valid characters");
-//						if (!validConfigName)
-//						{
-//							setPageComplete(false);
-//							return false;
-//						}
-//					}
-//				}
-//			}
-//			IProject handle = getProjectHandle();
-//			if (handle.exists())
-//			{
-//				setErrorMessage("A project with that name already exists in the workspace.");
-//				setPageComplete(false);
-//				return false;
-//			}
-//			setErrorMessage(null);
-//			setMessage(null);
-//			setPageComplete(true);
-//			return true;
-//		}
-//		setPageComplete(false);
+	protected boolean validatePage(){
 		return false;
 	}
-
-	//    public int getPriority() {
-	//        return fModuleInfoGroup.getPriority();     
-	//    }
-//	private boolean validateName(String name, String emptyMsg, String errorMsg)
-//	{
-//		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-//		if (name.equals(""))
-//		{
-//			setErrorMessage(null);
-//			setMessage(emptyMsg);
-//			return false;
-//		}
-//		IStatus nameStatus = workspace.validateName(name, 0);
-//		if (!nameStatus.isOK())
-//		{
-//			if (errorMsg == null)
-//				setErrorMessage(nameStatus.getMessage());
-//			else
-//				setErrorMessage(errorMsg);
-//			return false;
-//		}
-//		setErrorMessage(null);
-//		setMessage(null);
-//		return true;
-//	}
 }

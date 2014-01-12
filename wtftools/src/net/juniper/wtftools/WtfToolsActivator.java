@@ -1,18 +1,21 @@
 package net.juniper.wtftools;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 /**
  * The activator class controls the plug-in life cycle
  */
-public class WtfToolsActivator extends DefaultPlugin {
+public class WtfToolsActivator extends AbstractUIPlugin implements ILogSupport {
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "WtfTools"; //$NON-NLS-1$
 
 	// The shared instance
 	private static WtfToolsActivator plugin;
+	
+	private LogUtility logUtility;
 	
 	/**
 	 * The constructor
@@ -56,5 +59,28 @@ public class WtfToolsActivator extends DefaultPlugin {
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
 		return imageDescriptorFromPlugin(PLUGIN_ID, path);
+	}
+	
+	public void logError(String msg) {
+		getLogProxy().logErrorMessage(msg);
+	}
+
+	public void logError(Throwable e) {
+		getLogProxy().log(e);
+	}
+
+	public void logError(String msg, Throwable e) {
+		getLogProxy().log(msg, e);
+	}
+
+	public void logInfo(String msg) {
+		getLogProxy().logInfoMessage(msg);
+	}
+	
+	public LogUtility getLogProxy() {
+		if(logUtility == null){
+			logUtility = new LogUtility(getLog(), getBundle().getSymbolicName());
+		}
+		return logUtility;
 	}
 }

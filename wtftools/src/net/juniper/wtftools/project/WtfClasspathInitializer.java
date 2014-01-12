@@ -26,7 +26,8 @@ public class WtfClasspathInitializer extends ClasspathContainerInitializer{
 			}
 		}
 	}
-
+	
+	@Override
 	public Object getComparisonID(IPath containerPath, IJavaProject project){
 		return containerPath;
 	}

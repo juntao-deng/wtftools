@@ -41,27 +41,26 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.Workbench;
 
-import com.sysdeo.eclipse.tomcat.TomcatLauncherPlugin;
-
+@SuppressWarnings("restriction")
 public final class WtfProjectCommonTools {
 	public static final String LOCATION_KEY = "framework_location_key";
 	private static IProject currProject;
-//	public static IPath getJbossHome(){
-//		String jbossHome = System.getenv("JBOSS_HOME");
-//		WtfToolsActivator.getDefault().logInfo("get jboss home path:" + jbossHome);
-//		return Path.fromOSString(jbossHome);
-//	}
+	public static IPath getJbossHome(){
+		String jbossHome = System.getenv("JBOSS_HOME");
+		WtfToolsActivator.getDefault().logInfo("get jboss home path:" + jbossHome);
+		return Path.fromOSString(jbossHome);
+	}
 	
 	public static String getTomcatHome() {
-		String dir =  TomcatLauncherPlugin.getDefault().getTomcatDir();
-		if(dir == null)
-			return "";
-		return dir;
+//		String dir =  TomcatLauncherPlugin.getDefault().getTomcatDir();
+//		if(dir == null)
+//			return "";
+//		return dir;
+		return "";
 	}
 	
 	public static IProject getCurrentProject() {
-		 ISelectionService selectionService =     
-		 Workbench.getInstance().getActiveWorkbenchWindow().getSelectionService();    
+		ISelectionService selectionService = Workbench.getInstance().getActiveWorkbenchWindow().getSelectionService();    
 		 ISelection selection = selectionService.getSelection();
 		 IProject project = null;
 		 if(selection instanceof IStructuredSelection) {    
@@ -70,8 +69,7 @@ public final class WtfProjectCommonTools {
 	             project= ((IResource)element).getProject();    
 	         }
 			 else if (element instanceof PackageFragmentRootContainer) {    
-	             IJavaProject jProject =     
-	                 ((PackageFragmentRootContainer)element).getJavaProject();    
+	             IJavaProject jProject = ((PackageFragmentRootContainer)element).getJavaProject();    
 	             project = jProject.getProject();    
 	         } 
 	         else if (element instanceof IJavaElement) {    
@@ -98,9 +96,21 @@ public final class WtfProjectCommonTools {
 	
 	public static String getFrameworkLocation() {
 		IPreferenceStore store = WtfToolsActivator.getDefault().getPreferenceStore();
-		return store.getString(LOCATION_KEY);
+		String location = store.getString(LOCATION_KEY);
+		if(location == null || location.equals("")){
+			location = detectWtfLocation();
+		}
+		return location;
 	}
 	
+	private static String detectWtfLocation() {
+		IProject proj = getCurrentProject();
+		if(proj == null)
+			return null;
+		IPath path = getCurrentProject().getLocation().removeLastSegments(1);
+		return null;
+	}
+
 	public static String getFrameworkWebLocation() {
 		return getFrameworkLocation() + "/web";
 	}
@@ -161,9 +171,8 @@ public final class WtfProjectCommonTools {
 	 */
 	 public static void checkOutFile(String path){
 		IPath ph = new Path(path);
-		IFile ifile =  ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(ph);
+		IFile ifile = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(ph);
 		File filea = new File(path);
-		//如果文件不可写，checkout,若果未连cc，变为可写
 		IWorkbenchPart part = null;
 		Shell shell = null;
 		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
@@ -200,7 +209,7 @@ public final class WtfProjectCommonTools {
 	 }
 	
 	public static String getMiddleware() {
-		return "tomcat";
+		return "jboss";
 	}
 	
 	public static boolean isTomcat() {
