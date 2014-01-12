@@ -164,7 +164,7 @@ public class WtfPreferencePagesLocation extends PreferencePage implements
 	public boolean performOk() {
 		IPreferenceStore store = WtfToolsActivator.getDefault().getPreferenceStore();
 		if(validLocation()){
-			store.setValue(WtfProjectCommonTools.LOCATION_KEY, locationGroup.getLocation());
+//			store.setValue(WtfProjectCommonTools.LOCATION_KEY, locationGroup.getLocation());
 		}
 		else{
 			showErrorMsg("The path must be pointed to the framework project's root directory");

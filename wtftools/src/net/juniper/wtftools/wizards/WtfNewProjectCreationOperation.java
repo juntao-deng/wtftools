@@ -20,6 +20,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
 
 public class WtfNewProjectCreationOperation extends WorkspaceModifyOperation{
@@ -31,6 +33,12 @@ public class WtfNewProjectCreationOperation extends WorkspaceModifyOperation{
 
 	@Override
 	protected void execute(IProgressMonitor monitor) throws CoreException, InvocationTargetException, InterruptedException{
+		String location = WtfProjectCommonTools.getFrameworkLocation();
+		if(location == null || location.equals("")){
+			MessageDialog.openError(Display.getCurrent().getActiveShell(), "No wtf project", "Please add wtfbase project first");
+			return;
+		}
+		
 		monitor.beginTask("Creating Project...", 5);
 		monitor.subTask("Creating Project");
 		IProject project = createProject();

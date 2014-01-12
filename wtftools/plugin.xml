@@ -203,7 +203,8 @@
          <action
                class="net.juniper.wtftools.project.AddWtfProjectNature"
                id="net.juniper.wtftools.project.AddWtfProjectNature"
-               label="Add Wtf Project Nature">
+               label="Add Wtf Project Nature"
+               menubarPath="net.juniper.wst-tool/group0">
          </action>
        	</objectContribution>
     </extension>
@@ -227,11 +228,12 @@
             id="net.juniper.wtftools.preferences.WtfPreferencePagesCategory"
             name="Wtf Configurations">
       </page>
-      <page
+      <!--<page
             category="net.juniper.wtftools.preferences.WtfPreferencePagesCategory"
             class="net.juniper.wtftools.preferences.WtfPreferencePagesLocation"
             id="net.juniper.wtftools.preferences.WtfPreferencePagesLocation"
             name="Framework Project Location">
       </page>
+      -->
    </extension>
 </plugin>

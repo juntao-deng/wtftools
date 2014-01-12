@@ -30,7 +30,6 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.internal.ui.packageview.PackageFragmentRootContainer;
 import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Display;
@@ -43,7 +42,7 @@ import org.eclipse.ui.internal.Workbench;
 
 @SuppressWarnings("restriction")
 public final class WtfProjectCommonTools {
-	public static final String LOCATION_KEY = "framework_location_key";
+//	public static final String LOCATION_KEY = "framework_location_key";
 	private static IProject currProject;
 	public static IPath getJbossHome(){
 		String jbossHome = System.getenv("JBOSS_HOME");
@@ -94,22 +93,27 @@ public final class WtfProjectCommonTools {
 		return null;
 	}
 	
-	public static String getFrameworkLocation() {
-		IPreferenceStore store = WtfToolsActivator.getDefault().getPreferenceStore();
-		String location = store.getString(LOCATION_KEY);
-		if(location == null || location.equals("")){
-			location = detectWtfLocation();
+	public static IProject getFrameworkProject() {
+		IProject[] projs = getJavaProjects();
+		for(int i = 0; i < projs.length; i ++){
+			IProject proj = projs[i];
+			if(proj.getName().equals("wtfbase"))
+				return proj;
 		}
-		return location;
-	}
-	
-	private static String detectWtfLocation() {
-		IProject proj = getCurrentProject();
-		if(proj == null)
-			return null;
-		IPath path = getCurrentProject().getLocation().removeLastSegments(1);
 		return null;
 	}
+	
+	public static String getFrameworkLocation() {
+//		IPreferenceStore store = WtfToolsActivator.getDefault().getPreferenceStore();
+//		String location = store.getString(LOCATION_KEY);
+//		if(location == null || location.equals("")){
+//			location = detectWtfLocation();
+//		}
+//		return location;
+		IProject proj = getFrameworkProject();
+		return proj == null ? null : proj.getLocation().toOSString();
+	}
+	
 
 	public static String getFrameworkWebLocation() {
 		return getFrameworkLocation() + "/web";

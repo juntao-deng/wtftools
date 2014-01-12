@@ -54,7 +54,8 @@ public class ClasspathComputer{
 				Iterator<String> it = lines.iterator();
 				Workspace wp = (Workspace) ResourcesPlugin.getWorkspace();
 				while(it.hasNext()){
-					result.add(JavaCore.newContainerEntry(new Path(it.next())));
+					String libPath = "org.eclipse.jdt.USER_LIBRARY/" + it.next();
+					result.add(JavaCore.newContainerEntry(new Path(libPath)));
 				}
 			}
 		}
