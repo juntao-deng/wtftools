@@ -72,7 +72,7 @@ public class WtfNewProjectCreationOperation extends WorkspaceModifyOperation{
 	private void copyHomeApplication(IProject project) {
 		String fwLocation = WtfProjectCommonTools.getFrameworkWebLocation() + "/";
 		try {
-			String projectPath = project.getLocation().toOSString();
+			String projectPath = project.getLocation().toPortableString();
 			String projectLocation = projectPath + "/web/";
 			FileUtils.copyFile(new File(fwLocation + "index.html"), new File(projectLocation + "index.html"));
 //			FileUtils.copyFile(new File(fwLocation + "rest/homeinfos.js"), new File(projectLocation + "rest/homeinfos.js"));
@@ -116,10 +116,10 @@ public class WtfNewProjectCreationOperation extends WorkspaceModifyOperation{
 //		
 //	}
 //
-//	private void writeTomcatConfig(IProject project) {
-//		TomcatHelper.writeConfigFile(project.getLocation().toOSString(), projectProvider.getContext());
-//		TomcatHelper.writeContextFile(projectProvider.getContext(), project.getFullPath().append("web").toString());
-//	}
+	private void writeProjectConfig(IProject project) {
+		WtfProjectHelper.writeConfigFile(project.getLocation().toOSString(), projectProvider.getContext());
+//		WtfProjectHelper.writeContextFile(projectProvider.getContext(), project.getFullPath().append("web").toString());
+	}
 
 	private IProject createProject() throws CoreException{
 		IProject project = projectProvider.getProject();
@@ -132,6 +132,8 @@ public class WtfNewProjectCreationOperation extends WorkspaceModifyOperation{
 		natures.add(WtfToolsConstants.WTF_NATURE_ID);
 		
 		ProjCoreUtility.addNatureToProject(project, natures.toArray(new String[0]), null);
+		
+		writeProjectConfig(project);
 		return project;
 	}
 

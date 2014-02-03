@@ -54,8 +54,21 @@ public class ClasspathComputer{
 				Iterator<String> it = lines.iterator();
 				Workspace wp = (Workspace) ResourcesPlugin.getWorkspace();
 				while(it.hasNext()){
-					String libPath = "org.eclipse.jdt.USER_LIBRARY/" + it.next();
-					result.add(JavaCore.newContainerEntry(new Path(libPath)));
+					String lib = it.next();
+					if(lib.startsWith("$project_")){
+						String projName = lib.substring("$project_".length());
+						IProject proj = ResourcesPlugin.getWorkspace().getRoot().getProject(projName);
+						if(proj == project)
+							continue;
+						if(proj != null)
+							result.add(JavaCore.newProjectEntry(proj.getFullPath()));
+						else
+							WtfToolsActivator.getDefault().logError("can not find project with name:" + projName);
+					}
+					else{
+						String libPath = "org.eclipse.jdt.USER_LIBRARY/" + lib;
+						result.add(JavaCore.newContainerEntry(new Path(libPath)));
+					}
 				}
 			}
 		}

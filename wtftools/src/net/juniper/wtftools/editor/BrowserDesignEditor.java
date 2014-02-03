@@ -40,7 +40,7 @@ import org.eclipse.ui.part.FileEditorInput;
 public class BrowserDesignEditor extends EditorPart {
 
 	private static final String WTF_EVENT = "wtf_event:";
-	private static final String TEMP_WORK_DIR = System.getProperty("user.dir");
+	private static final String TEMP_WORK_DIR = System.getProperty("user.dir").replaceAll("\\\\", "/");
 	private static final String APP_REPLACE = "<div wtftype=\"application\" wtfmetadata=\"#REPLACE#\"/>";
 	private Browser browser;
 	private IPath appPath;
@@ -251,7 +251,7 @@ public class BrowserDesignEditor extends EditorPart {
 			result = result.replaceAll("#FRAME_PATH#",
 					WtfProjectCommonTools.getFrameworkWebLocation() + "/");
 			result = result.replace("#CTXPATH#", WtfProjectCommonTools
-					.getCurrentWtfProject().getLocation().toOSString()
+					.getCurrentWtfProject().getLocation().toPortableString()
 					+ "/web/");
 			FileUtils.writeStringToFile(target, result);
 			return "file:///" + generatedPath;

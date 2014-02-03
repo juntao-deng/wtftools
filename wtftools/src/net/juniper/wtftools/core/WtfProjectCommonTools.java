@@ -111,7 +111,7 @@ public final class WtfProjectCommonTools {
 //		}
 //		return location;
 		IProject proj = getFrameworkProject();
-		return proj == null ? null : proj.getLocation().toOSString();
+		return proj == null ? null : proj.getLocation().toPortableString();
 	}
 	
 
@@ -223,7 +223,7 @@ public final class WtfProjectCommonTools {
 	public static String getCurrentProjectCtx() {
 		String str;
 		try {
-			str = FileUtils.readFileToString(new File(getCurrentProject().getFile(".tomcatplugin").getLocation().toString()));
+			str = FileUtils.readFileToString(new File(getCurrentProject().getFile(".wtf_project").getLocation().toString()));
 			int begin = str.indexOf("<webPath>") + "<webPath>".length() + 1;
 			int end = str.indexOf("</webPath>");
 			String ctx = str.substring(begin, end);
