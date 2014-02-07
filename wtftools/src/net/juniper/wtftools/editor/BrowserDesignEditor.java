@@ -329,10 +329,12 @@ public class BrowserDesignEditor extends EditorPart {
 			}
 			hiddenViews.clear();
 		}
-		
-		htmlEditor.clearChanged();
-		controllerEditor.clearChanged();
-		modelEditor.clearChanged();
+		if(htmlEditor != null)
+			htmlEditor.clearChanged();
+		if(controllerEditor != null)
+			controllerEditor.clearChanged();
+		if(modelEditor != null)
+			modelEditor.clearChanged();
 		super.dispose();
 	}
 
