@@ -1,14 +1,8 @@
 package net.juniper.wtftools.project;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import net.juniper.wtftools.WtfToolsActivator;
-import net.juniper.wtftools.core.WtfProjectCommonTools;
 import net.juniper.wtftools.core.WtfToolsConstants;
 
-import org.apache.commons.io.FileUtils;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -25,7 +19,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IAccessRule;
-import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.JavaCore;
 
@@ -54,25 +47,41 @@ public class ProjCoreUtility {
 	}
 
 	public static IClasspathEntry[] getClasspathEntry(IProject project, WtfProjectClassPathContainerID id) throws CoreException{
-		if(WtfProjectCommonTools.isTomcat()){
-			if(WtfProjectCommonTools.getTomcatHome().equals("")){
-				WtfToolsActivator.getDefault().logError("Please config tomcat's path first");
-				return new IClasspathEntry[0];
-			}
-			switch (id){
-//				case Middleware_Library:
-//					return computeMiddlewareJarsInPath();
-//				case ThdParty_Library:
+		switch (id){
+//			case WTF_BASIC_Library:
+//				try{
 //					String path = WtfProjectCommonTools.getFrameworkWebLocation() + "/init/thirdparty.txt";
-//					return computeClasspathEntry(ClasspathComputer.compute3rdPartyJarsInPath(path), Accessible);
-//				case Product_Common:
-//					String dir = WtfProjectCommonTools.getFrameworkWebLocation() + "/init/common-lib";
-//					return computeClasspathEntry(ClasspathComputer.computeProductJarsInPath(dir), Accessible);
-				default:
-					return new IClasspathEntry[0];
-			}
+//					List<String> lines = FileUtils.readLines(new File(path));
+//					if(lines != null){
+//						Iterator<String> it = lines.iterator();
+//						Workspace wp = (Workspace) ResourcesPlugin.getWorkspace();
+//						List<IClasspathEntry> entries = new ArrayList<IClasspathEntry>();
+//						while(it.hasNext()){
+//							String lib = it.next();
+//							if(lib.startsWith("$project_")){
+//								String projName = lib.substring("$project_".length());
+//								IProject proj = ResourcesPlugin.getWorkspace().getRoot().getProject(projName);
+//								if(proj == project)
+//									continue;
+//								if(proj != null)
+//									entries.add(JavaCore.newProjectEntry(proj.getFullPath()));
+//								else
+//									WtfToolsActivator.getDefault().logError("can not find project with name:" + projName);
+//							}
+//							else{
+//								String libPath = "org.eclipse.jdt.USER_LIBRARY/" + lib;
+//								entries.add(JavaCore.newContainerEntry(new Path(libPath)));
+//							}
+//						}
+//						return entries.toArray(new IClasspathEntry[0]);
+//					}
+//				}
+//				catch(Exception e){
+//					WtfToolsActivator.getDefault().logError(e.getMessage(), e);
+//				}
+			default:
+				return new IClasspathEntry[0];
 		}
-		return new IClasspathEntry[0];
 	}
 
 //	private static IClasspathEntry[] computeMiddlewareJarsInPath() {
@@ -88,31 +97,28 @@ public class ProjCoreUtility {
 //		return list.toArray(new IClasspathEntry[0]);
 //	}
 
-	public static IClasspathEntry[] computeClasspathEntry(LibraryLocation[] libs, IAccessRule[] rules) throws CoreException{
-		ArrayList<IClasspathEntry> list = new ArrayList<IClasspathEntry>();
-		if (libs != null){
-			for (LibraryLocation lib : libs){
-				IClasspathAttribute[] atts = new IClasspathAttribute[0];
-				if (lib.getDocLocation() != null)
-				{
-					atts = new IClasspathAttribute[] { JavaCore
-							.newClasspathAttribute(IClasspathAttribute.JAVADOC_LOCATION_ATTRIBUTE_NAME, lib.getDocLocation()) };
-				}
-				IClasspathEntry entry = JavaCore.newLibraryEntry(lib.getLibPath(), lib.getSrcPath(), null, rules, atts, false);
-				list.add(entry);
-			}
-		}
-		return list.toArray(new IClasspathEntry[0]);
-	}
+//	public static IClasspathEntry[] computeClasspathEntry(LibraryLocation[] libs, IAccessRule[] rules) throws CoreException{
+//		ArrayList<IClasspathEntry> list = new ArrayList<IClasspathEntry>();
+//		if (libs != null){
+//			for (LibraryLocation lib : libs){
+//				IClasspathAttribute[] atts = new IClasspathAttribute[0];
+//				if (lib.getDocLocation() != null)
+//				{
+//					atts = new IClasspathAttribute[] { JavaCore
+//							.newClasspathAttribute(IClasspathAttribute.JAVADOC_LOCATION_ATTRIBUTE_NAME, lib.getDocLocation()) };
+//				}
+//				IClasspathEntry entry = JavaCore.newLibraryEntry(lib.getLibPath(), lib.getSrcPath(), null, rules, atts, false);
+//				list.add(entry);
+//			}
+//		}
+//		return list.toArray(new IClasspathEntry[0]);
+//	}
 
 
-	public static void createFolder(IFolder folder) throws CoreException
-	{
-		if (!folder.exists())
-		{
+	public static void createFolder(IFolder folder) throws CoreException{
+		if (!folder.exists()){
 			IContainer parent = folder.getParent();
-			if (parent instanceof IFolder)
-			{
+			if (parent instanceof IFolder){
 				createFolder((IFolder) parent);
 			}
 			folder.create(true, true, null);

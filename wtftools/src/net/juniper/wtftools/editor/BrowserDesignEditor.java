@@ -202,7 +202,7 @@ public class BrowserDesignEditor extends EditorPart {
 		TabItem itemDesigner = new TabItem(tab, SWT.NONE);
 		itemDesigner.setText("Designer");
 
-		browser = new Browser(tab, SWT.NONE);
+		browser = new Browser(tab, SWT.WEBKIT);
 		itemDesigner.setControl(browser);
 		browser.setJavascriptEnabled(true);
 		String url = getUrl();

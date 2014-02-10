@@ -73,7 +73,7 @@ public class WtfProjectNewWizard extends Wizard implements INewWizard {
 				}
 
 				@Override
-				public boolean isWithJpa() {
+				public boolean isWithEjb() {
 					return page2.isWithJpa();
 				}
 

@@ -1,7 +1,6 @@
 package net.juniper.wtftools.project;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -13,9 +12,7 @@ import net.juniper.wtftools.core.WtfToolsConstants;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.core.internal.resources.Workspace;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -35,7 +32,7 @@ public class ClasspathComputer{
 			monitor.subTask("Update classpath");
 			IJavaProject javaProject = JavaCore.create(project);
 			IClasspathEntry[] entries = getClasspath(project, false);
-			javaProject.setRawClasspath(entries, javaProject.getPath().append("web/WEB-INF/classes"), monitor);
+			javaProject.setRawClasspath(entries, javaProject.getOutputLocation(), monitor);
 		}
 	}
 
@@ -134,26 +131,26 @@ public class ClasspathComputer{
 //		return list.toArray(new LibraryLocation[0]);
 //	}
 
-	public static LibraryLocation[] computeProductJarsInPath(String path) {
-		List<LibraryLocation> list = new ArrayList<LibraryLocation>();
-		File dir = new File(path);
-		if(dir.exists()){
-			File[] fs = dir.listFiles(new FilenameFilter(){
-				@Override
-				public boolean accept(File dir, String name) {
-					return name.endsWith(".jar") && !name.endsWith("-sources.jar");
-				}
-				
-			});
-			if(fs != null && fs.length > 0){
-				Workspace wp = (Workspace) ResourcesPlugin.getWorkspace();
-				for(int i = 0; i < fs.length; i ++){
-					IPath fpath = Path.fromOSString(fs[i].getAbsolutePath());
-					IFile file = (IFile) wp.newResource(fpath, IResource.FILE);
-					list.add(new LibraryLocation(file));
-				}
-			}
-		}
-		return list.toArray(new LibraryLocation[0]);
-	}
+//	public static LibraryLocation[] computeProductJarsInPath(String path) {
+//		List<LibraryLocation> list = new ArrayList<LibraryLocation>();
+//		File dir = new File(path);
+//		if(dir.exists()){
+//			File[] fs = dir.listFiles(new FilenameFilter(){
+//				@Override
+//				public boolean accept(File dir, String name) {
+//					return name.endsWith(".jar") && !name.endsWith("-sources.jar");
+//				}
+//				
+//			});
+//			if(fs != null && fs.length > 0){
+//				Workspace wp = (Workspace) ResourcesPlugin.getWorkspace();
+//				for(int i = 0; i < fs.length; i ++){
+//					IPath fpath = Path.fromOSString(fs[i].getAbsolutePath());
+//					IFile file = (IFile) wp.newResource(fpath, IResource.FILE);
+//					list.add(new LibraryLocation(file));
+//				}
+//			}
+//		}
+//		return list.toArray(new LibraryLocation[0]);
+//	}
 }

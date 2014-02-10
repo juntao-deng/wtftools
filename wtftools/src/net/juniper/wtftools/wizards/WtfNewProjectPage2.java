@@ -24,7 +24,7 @@ public class WtfNewProjectPage2 extends WizardPage implements  IPropertyChangeLi
 	public static IProject project;
 	private StringDialogField contextPath;
 	private SelectionButtonDialogField homePageField;
-	private SelectionButtonDialogField jpaConfigField;
+	private SelectionButtonDialogField ejbCreatingField;
 	
 	private StringDialogField createStringDialogField(String labeltext, Composite parent){
 		StringDialogField field = new StringDialogField();
@@ -71,7 +71,7 @@ public class WtfNewProjectPage2 extends WizardPage implements  IPropertyChangeLi
 	}
 	
 	public boolean isWithJpa() {
-		return jpaConfigField.isSelected();
+		return ejbCreatingField.isSelected();
 	}
 
 	@Override
@@ -84,8 +84,8 @@ public class WtfNewProjectPage2 extends WizardPage implements  IPropertyChangeLi
 		homePageField = createCheckBoxField("With Home Page", composite);
 		homePageField.setSelection(true);
 		
-		jpaConfigField = createCheckBoxField("Jpa Configuration", composite);
-		jpaConfigField.setSelection(true);
+		ejbCreatingField = createCheckBoxField("Creat Ejb Project", composite);
+		ejbCreatingField.setSelection(true);
 		
 		setControl(composite);
 		fInited = true;

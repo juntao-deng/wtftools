@@ -10,7 +10,7 @@ public interface IProjectProvider{
 
 	public IPath getLocationPath();
 	
-	public boolean isWithJpa();
+	public boolean isWithEjb();
 	
 	public boolean isWithHome();
 	

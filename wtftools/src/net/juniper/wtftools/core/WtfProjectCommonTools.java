@@ -1,6 +1,7 @@
 package net.juniper.wtftools.core;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -50,6 +51,46 @@ public final class WtfProjectCommonTools {
 		return Path.fromOSString(jbossHome);
 	}
 	
+	public static String getDeploymentPath() {
+		IPath deployPath = getJbossHome();
+		if(deployPath != null){
+			String deployPathStr = deployPath.toOSString();
+			String basePath = deployPathStr + "/standalone/tmp/vfs";
+			String path = getExistsPath(basePath);
+			if(path == null){
+				basePath = deployPathStr + "/domain/tmp/vfs";
+				path = getExistsPath(basePath);
+			}
+			return path;
+		}
+		return null;
+	}
+	
+	private static String getExistsPath(String basePath) {
+		File vfsDir = new File(basePath);
+		File[] fs = vfsDir.listFiles(new FilenameFilter() {
+			@Override
+			public boolean accept(File dir, String name) {
+				return name.startsWith("deployment");
+			}
+		});
+		for(int i = 0; i < fs.length; i ++){
+			File f = fs[i];
+			if(f.isDirectory()){
+				int length = f.list(new FilenameFilter() {
+					
+					@Override
+					public boolean accept(File dir, String name) {
+						return name.startsWith("wtfbase.war");
+					}
+				}).length;
+				if(length > 0)
+					return f.getAbsolutePath();
+			}
+		}
+		return null;
+	}
+
 	public static String getTomcatHome() {
 //		String dir =  TomcatLauncherPlugin.getDefault().getTomcatDir();
 //		if(dir == null)
@@ -159,7 +200,7 @@ public final class WtfProjectCommonTools {
 		
 	}
 	
-	public static String getWrokspaceDirPath() {
+	public static String getWorkspaceDirPath() {
 		IPath path = ResourcesPlugin.getWorkspace().getRoot().getLocation();
 		String strPath = path.toOSString();
 		return strPath;

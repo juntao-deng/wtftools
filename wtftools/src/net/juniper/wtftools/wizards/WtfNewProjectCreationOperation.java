@@ -15,7 +15,9 @@ import net.juniper.wtftools.project.ProjCoreUtility;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
@@ -41,14 +43,11 @@ public class WtfNewProjectCreationOperation extends WorkspaceModifyOperation{
 		
 		monitor.beginTask("Creating Project...", 5);
 		monitor.subTask("Creating Project");
-		IProject project = createProject();
-		monitor.worked(1);
-
-		monitor.subTask("Updating project's classpath...");
-		computeInitClasspath(project, monitor);
-		addApplicationFiles(project);
-		monitor.worked(1);
-		
+		IProject project = createProject(monitor);
+		if(projectProvider.isWithEjb()){
+			IProject ejbProject = createEjbProject(monitor);
+			ejbProject.refreshLocal(IProject.DEPTH_INFINITE, monitor);
+		}
 		project.refreshLocal(IProject.DEPTH_INFINITE, monitor);
 	}
 
@@ -61,8 +60,6 @@ public class WtfNewProjectCreationOperation extends WorkspaceModifyOperation{
 				copyHomeApplication(project);
 				FileUtils.copyDirectory(new File(webLocation + "/init/copy/src"), new File(projectPath + "/src"));
 			}
-			if(projectProvider.isWithJpa())
-				FileUtils.copyDirectory(new File(webLocation + "/init/copy/jpares"), new File(projectPath + "/resources"));
 		} 
 		catch (IOException e) {
 			WtfToolsActivator.getDefault().logError(e);
@@ -121,10 +118,53 @@ public class WtfNewProjectCreationOperation extends WorkspaceModifyOperation{
 //		WtfProjectHelper.writeContextFile(projectProvider.getContext(), project.getFullPath().append("web").toString());
 	}
 
-	private IProject createProject() throws CoreException{
+	private IProject createEjbProject(IProgressMonitor monitor) throws CoreException{
+		String projName = projectProvider.getProjectName();
+		if(projName.length() > 2 && projName.substring(projName.length() - 2).toLowerCase().equals("ui")){
+			projName = projName.substring(0, projName.length() - 2) + "Ejb";
+		}
+		else{
+			projName = projName + "Ejb";
+		}
+		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projName);
+		if (!project.exists()){
+			IPath path = projectProvider.getLocationPath();
+			if(!WtfProjectCommonTools.getWorkspaceDirPath().equals(path.toOSString()))
+				path = path.append(projName);
+			ProjCoreUtility.createProject(project, path, null);
+			project.open(null);
+		}
+		List<String> natures = new ArrayList<String>();
+		natures.add(JavaCore.NATURE_ID);
+		natures.add(WtfToolsConstants.WTF_NATURE_ID);
+		
+		ProjCoreUtility.addNatureToProject(project, natures.toArray(new String[0]), null);
+		
+		IJavaProject javaProject = JavaCore.create(project);
+		List<IClasspathEntry> list = new ArrayList<IClasspathEntry>();
+		list.add(ProjCoreUtility.createSourceEntry(project, "src"));
+//		list.add(ProjCoreUtility.createSourceEntry(project, "resources"));
+		javaProject.setRawClasspath(list.toArray(new IClasspathEntry[0]), javaProject.getPath().append("build/classes"), null);
+		ClasspathComputer.updateClasspath(project, monitor);
+		
+		try{
+			String webLocation = WtfProjectCommonTools.getFrameworkWebLocation();
+			String projectPath = project.getLocation().toOSString();
+			FileUtils.copyDirectory(new File(webLocation + "/init/copy/ejbres"), new File(projectPath + "/src"));
+		}
+		catch (IOException e) {
+			WtfToolsActivator.getDefault().logError(e);
+		}
+		return project;
+	}
+	
+	private IProject createProject(IProgressMonitor monitor) throws CoreException{
 		IProject project = projectProvider.getProject();
 		if (!project.exists()){
-			ProjCoreUtility.createProject(project, projectProvider.getLocationPath(), null);
+			IPath projPath = projectProvider.getLocationPath();
+			if(!WtfProjectCommonTools.getWorkspaceDirPath().equals(projPath.toOSString()))
+				projPath = projPath.append(projectProvider.getProjectName());
+			ProjCoreUtility.createProject(project, projPath, null);
 			project.open(null);
 		}
 		List<String> natures = new ArrayList<String>();
@@ -134,6 +174,14 @@ public class WtfNewProjectCreationOperation extends WorkspaceModifyOperation{
 		ProjCoreUtility.addNatureToProject(project, natures.toArray(new String[0]), null);
 		
 		writeProjectConfig(project);
+		computeInitClasspath(project, monitor);
+		
+		monitor.worked(1);
+
+		monitor.subTask("Updating project's classpath...");
+		addApplicationFiles(project);
+		monitor.worked(1);
+		
 		return project;
 	}
 
@@ -141,12 +189,12 @@ public class WtfNewProjectCreationOperation extends WorkspaceModifyOperation{
 		IJavaProject javaProject = JavaCore.create(project);
 		List<IClasspathEntry> list = new ArrayList<IClasspathEntry>();
 		list.add(ProjCoreUtility.createSourceEntry(project, "src"));
-		list.add(ProjCoreUtility.createSourceEntry(project, "resources"));
+//		list.add(ProjCoreUtility.createSourceEntry(project, "resources"));
 //		list.add(ProjCoreUtility.createSourceEntry(project, "src/restapis"));
 //		list.add(ProjCoreUtility.createSourceEntry(project, "src/services"));
 //		list.add(ProjCoreUtility.createSourceEntry(project, "src/implements"));
 //		list.add(ProjCoreUtility.createSourceEntry(project, "src/resources"));
-		javaProject.setRawClasspath(list.toArray(new IClasspathEntry[0]), null);
+		javaProject.setRawClasspath(list.toArray(new IClasspathEntry[0]), javaProject.getPath().append("build/classes"), null);
 		
 		IFolder folder = project.getFolder("web");
 		ProjCoreUtility.createFolder(folder);
