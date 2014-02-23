@@ -3,31 +3,28 @@
 <plugin>
 
    <extension
-         id="net.juniper.wtftools.builder.WtfProjectBuilder"
-         name="Wtf Project Builder"
+         id="net.juniper.scutools.builder.ScuNodeProjectBuilder"
+         name="Scu Node Project Builder"
          point="org.eclipse.core.resources.builders">
       <builder
             hasNature="true">
          <run
-               class="net.juniper.wtftools.builder.WtfProjectBuilder">
+               class="net.juniper.scutools.builder.ScuNodeProjectBuilder">
          </run>
       </builder>
    </extension>
    <extension
-         id="net.juniper.wtftools.builder.WtfProjectNature"
-         name="Wtf Project Nature"
+         id="net.juniper.scutools.builder.ScuNodeProjectNature"
+         name="SCU Node Project Nature"
          point="org.eclipse.core.resources.natures">
       <runtime>
          <run
-               class="net.juniper.wtftools.builder.WtfProjectNature">
+               class="net.juniper.scutools.builder.ScuNodeProjectNature">
          </run>
       </runtime>
       <builder
             id="net.juniper.wtftools.builder.WtfProjectBuilder">
       </builder>
-      <requires-nature
-            id="org.eclipse.jdt.core.javanature">
-      </requires-nature>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -37,7 +34,7 @@
       </category>
       <command
             name="Add/RemoveWtf Project Nature"
-            defaultHandler="net.juniper.wtftools.builder.AddRemoveWtfProjectNatureHandler"
+            defaultHandler="net.juniper.scutools.builder.AddRemoveScuProjectNatureHandler"
             categoryId="WtfTools.wtfprojectNature.category"
             id="WtfTools.addRemoveWtfProjectNature">
       </command>
@@ -119,7 +116,16 @@
       </category>
       <wizard
             category="WtfTools"
-            class="net.juniper.wtftools.wizards.WtfProjectNewWizard"
+            class="net.juniper.scutools.wizards.ScuNodeProjectWizard"
+            finalPerspective="org.eclipse.wst.jsdt.ui.JavaPerspective"
+            icon="icons/sample.gif"
+            id="net.juniper.wtftools.wizards.ScuNodeProjectWizard"
+            name="SCU Node Project Wizard"
+            project="true">
+      </wizard>
+      <wizard
+            category="WtfTools"
+            class="net.juniper.scutools.wizards.WtfProjectNewWizard"
             icon="icons/sample.gif"
             id="net.juniper.wtftools.wizards.WtfProjectNewWizard"
             name="Wtf Project Wizard"
@@ -127,7 +133,7 @@
       </wizard>
       <wizard
             category="WtfTools"
-            class="net.juniper.wtftools.wizards.WtfApplicationNewWizard"
+            class="net.juniper.scutools.wizards.WtfApplicationNewWizard"
             icon="icons/sample.gif"
             id="net.juniper.wtftools.wizards.WtfApplicationNewWizard"
             name="Wtf Application Wizard"
@@ -135,7 +141,7 @@
       </wizard>
       <wizard
             category="WtfTools"
-            class="net.juniper.wtftools.wizards.WtfTemplateNewWizard"
+            class="net.juniper.scutools.wizards.WtfTemplateNewWizard"
             icon="icons/sample.gif"
             id="net.juniper.wtftools.wizards.WtfTemplateNewWizard"
             name="Wtf Template Wizard"
@@ -152,7 +158,7 @@
             name="Wtf View"
             icon="icons/sample.gif"
             category="WtfTools"
-            class="net.juniper.wtftools.views.WtfProjectView"
+            class="net.juniper.scutools.views.WtfProjectView"
             id="net.juniper.wtftools.views.WtfProjectView">
       </view>
    </extension>
@@ -177,7 +183,7 @@
    <extension
          point="org.eclipse.jdt.core.classpathContainerInitializer">
       <classpathContainerInitializer
-            class="net.juniper.wtftools.project.WtfClasspathInitializer"
+            class="net.juniper.scutools.project.WtfClasspathInitializer"
             id="net.juniper.wtf.library.container">
       </classpathContainerInitializer>
    </extension>
@@ -196,12 +202,12 @@
                value="net.juniper.wtftools.builder.WtfProjectNature"
                name="projectNature"/>
          <action
-               class="net.juniper.wtftools.project.UpdateWtfClasspathAction"
+               class="net.juniper.scutools.project.UpdateWtfClasspathAction"
                id="net.juniper.wtftools.project.UpdateWtfClasspathAction"
                label="Update Wtf ClassPath"
                menubarPath="net.juniper.wst-tool/group0"/>
          <action
-               class="net.juniper.wtftools.project.AddWtfProjectNature"
+               class="net.juniper.scutools.project.AddWtfProjectNature"
                id="net.juniper.wtftools.project.AddWtfProjectNature"
                label="Add Wtf Project Nature"
                menubarPath="net.juniper.wst-tool/group0">
@@ -211,7 +217,7 @@
    <extension
          point="org.eclipse.ui.editors">
       <editor
-            class="net.juniper.wtftools.editor.BrowserDesignEditor"
+            class="net.juniper.scutools.editor.BrowserDesignEditor"
             default="false"
             filenames="*.html"
             id="net.juniper.wtftools.editor.BrowserDesignEditor"
@@ -224,9 +230,15 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            class="net.juniper.wtftools.preferences.WtfPreferencePagesCategory"
-            id="net.juniper.wtftools.preferences.WtfPreferencePagesCategory"
-            name="Wtf Configurations">
+            class="net.juniper.scutools.preferences.ScuPreferencePagesCategory"
+            id="net.juniper.scutools.preferences.ScuPreferencePagesCategory"
+            name="SCU Configurations">
+      </page>
+      <page
+            category="net.juniper.scutools.preferences.ScuPreferencePagesCategory"
+            class="net.juniper.scutools.preferences.ScuPreferencePagesLocation"
+            id="net.juniper.scutools.preferences.ScuPreferencePagesLocation"
+            name="NodeJS Configuration">
       </page>
       <!--<page
             category="net.juniper.wtftools.preferences.WtfPreferencePagesCategory"
@@ -235,5 +247,32 @@
             name="Framework Project Location">
       </page>
       -->
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchShortcuts">
+      <shortcut
+            class="net.juniper.scutools.launch.ScuV8LaunchShortcut"
+            icon="icons/start_server.gif"
+            id="net.juniper.scutools.launch.ScuV8LaunchShortcut"
+            label="Start SCU Server"
+            modes="run, debug">
+         <contextualLaunch>
+            <enablement>
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate
+                        operator="and">
+                     <test
+                           property="org.eclipse.debug.ui.projectNature"
+                           value="net.juniper.scutools.builder.ScuNodeProjectNature">
+                     </test>
+                  </iterate>
+               </with>
+            </enablement>
+         </contextualLaunch>
+      </shortcut>
    </extension>
 </plugin>
