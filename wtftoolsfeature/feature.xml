@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="net.juniper.wtf.plugin.feature"
-      label="net.juniper.wtf.plugin.feature"
+      id="net.juniper.scu.plugin.feature"
+      label="net.juniper.scu.plugin.feature"
       version="1.0.0.qualifier"
-      provider-name="mvp">
+      provider-name="Junos Space Platform">
 
    <description url="http://www.example.com/description">
       [Enter Feature Description here.]
@@ -18,7 +18,7 @@
    </license>
 
    <plugin
-         id="net.juniper.wtf.plugin"
+         id="net.juniper.scu.plugin"
          download-size="0"
          install-size="0"
          version="0.0.0"

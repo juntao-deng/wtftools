@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/net.juniper.wtf.plugin.feature_1.0.0.201401121711.jar" id="net.juniper.wtf.plugin.feature" version="1.0.0.201401121711"/>
+   <feature url="features/net.juniper.scu.plugin.feature_1.0.0.201402222350.jar" id="net.juniper.scu.plugin.feature" version="1.0.0.201402222350"/>
 </site>
