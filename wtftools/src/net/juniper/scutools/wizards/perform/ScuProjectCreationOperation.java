@@ -60,6 +60,24 @@ public class ScuProjectCreationOperation extends WorkspaceModifyOperation{
 				FileUtils.copyDirectory(new File(fwLocation + "rest"), new File(projectLocation + "rest"));//			FileUtils.copyDirectory(new File(fwLocation + "applications/dashboard"), new File(projectLocation + "applications/dashboard"));
 				FileUtils.copyDirectory(new File(fwLocation + "configuration"), new File(projectLocation + "configuration"));
 				updateFileContent(fwLocation, projectLocation);
+				
+				
+				InputStream input1 = null;
+				OutputStream output1 = null;
+				try{
+					input1 = ScuToolsActivator.class.getClassLoader().getResourceAsStream("resource/src/config.js");
+					output1 = new FileOutputStream(new File(projectPath + "/src/config.js"));
+					IOUtils.copy(input1, output1);
+				} 
+				catch (Exception e) {
+					ScuToolsActivator.getDefault().logError(e);
+				}
+				finally{
+					if(input1 != null)
+						IOUtils.closeQuietly(input1);
+					if(output1 != null)
+						IOUtils.closeQuietly(output1);
+				}
 			} 
 			catch (IOException e) {
 				ScuToolsActivator.getDefault().logError(e);
@@ -162,7 +180,7 @@ public class ScuProjectCreationOperation extends WorkspaceModifyOperation{
 			project.open(null);
 		}
 		List<String> natures = new ArrayList<String>();
-		natures.add(ScuToolsConstants.SCU_JS_NATURE_ID);
+//		natures.add(ScuToolsConstants.SCU_JS_NATURE_ID);
 		natures.add(ScuToolsConstants.SCU_NATURE_ID);
 		
 		ProjCoreUtility.addNatureToProject(project, natures.toArray(new String[0]), null);

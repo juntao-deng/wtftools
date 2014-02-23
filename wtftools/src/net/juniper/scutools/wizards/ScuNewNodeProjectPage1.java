@@ -179,7 +179,7 @@ public class ScuNewNodeProjectPage1 extends WizardPage{
 	
 	@Override
 	public IWizardPage getNextPage() {
-		WtfNewProjectPage2 nextpage = (WtfNewProjectPage2) super.getNextPage();
+		ScuNewNodeProjectPage2 nextpage = (ScuNewNodeProjectPage2) super.getNextPage();
 		if(nextpage.getContext() == null || nextpage.getContext().equals("")){
 			nextpage.setContext(this.getProjectName());
 		}
