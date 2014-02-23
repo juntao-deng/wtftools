@@ -1,7 +1,6 @@
 package net.juniper.scutools.builder;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Map;
 
@@ -15,6 +14,7 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 /**
@@ -43,24 +43,30 @@ public class ScuNodeProjectBuilder extends IncrementalProjectBuilder {
 
 	class WtfDeltaVisitor implements IResourceDeltaVisitor {
 		public boolean visit(IResourceDelta delta) throws CoreException {
-			String deployPath = ScuProjectCommonTools.getDeploymentPath();
-			String name = getProject().getName();
-			String targetPath = findTargetName(deployPath, name);
-			if(targetPath == null){
-				ScuToolsActivator.getDefault().logError("error getting target path");
+			IPath nodeHome = ScuProjectCommonTools.getNodeHome();
+			if(nodeHome == null){
+				ScuToolsActivator.getDefault().logError("error getting node home path");
 				return true;
 			}
-			else{
-				ScuToolsActivator.getDefault().logInfo("got target path:" + targetPath);
-			}
 			
-			IResource resource = delta.getResource();
+			IProject proj = getProject();
+			String spacePath = nodeHome.toPortableString() + "/space/" + proj.getName();
+			File projDir = new File(spacePath);
+			if(!projDir.exists()){
+				ScuToolsActivator.getDefault().logError("Project isn't in NodeJs, '" + proj.getName() + "', please sync it first");
+				return true;
+			}
 			try{
+				IResource resource = delta.getResource();
 				if(resource instanceof org.eclipse.core.internal.resources.File){
 					org.eclipse.core.internal.resources.File f = (org.eclipse.core.internal.resources.File) resource;
-					if(f.getFileExtension().equals("java") || f.getFileExtension().equals("class"))
-						return true;
-					String fullPath = targetPath + "/" + f.getProjectRelativePath().removeFirstSegments(1).toPortableString();
+					//ensure dir exists
+					String dirPath = spacePath + "/" + f.getProjectRelativePath().removeLastSegments(1).toPortableString();
+					File dir = new File(dirPath);
+					if(!dir.exists())
+						dir.mkdirs();
+					
+					String fullPath = spacePath + "/" + f.getProjectRelativePath().toPortableString();
 					switch (delta.getKind()) {
 						case IResourceDelta.ADDED:
 							ScuToolsActivator.getDefault().logInfo("adding file:" + fullPath);
@@ -84,18 +90,18 @@ public class ScuNodeProjectBuilder extends IncrementalProjectBuilder {
 			return true;
 		}
 		
-		private String findTargetName(String deployPath, String name) {
-			final String warName = name += ".war";
-			File[] fs = new File(deployPath).listFiles(new FilenameFilter() {
-				@Override
-				public boolean accept(File dir, String name) {
-					return name.startsWith(warName);
-				}
-			});
-			if(fs.length > 0)
-				return fs[0].getAbsolutePath();
-			return null;
-		}
+//		private String findTargetName(String deployPath, String name) {
+//			final String warName = name += ".war";
+//			File[] fs = new File(deployPath).listFiles(new FilenameFilter() {
+//				@Override
+//				public boolean accept(File dir, String name) {
+//					return name.startsWith(warName);
+//				}
+//			});
+//			if(fs.length > 0)
+//				return fs[0].getAbsolutePath();
+//			return null;
+//		}
 	}
 
 	protected void incrementalBuild(IResourceDelta delta,

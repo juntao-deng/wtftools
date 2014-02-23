@@ -18,7 +18,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
-public class WtfNewApplicationPage extends WizardPage
+public class ScuNewApplicationPage extends WizardPage
 {
 	private NameGroup fNameGroup;
 	private final class NameGroup extends Observable implements IDialogFieldListener
@@ -72,7 +72,7 @@ public class WtfNewApplicationPage extends WizardPage
 		return fNameGroup.getName();
 	}
 	
-	public WtfNewApplicationPage(ISelection selection){
+	public ScuNewApplicationPage(ISelection selection){
 		super("Wtf Application Wizard");
 		setTitle("Create a Wtf Application");
 		setDescription("Information about the application to be created"); //

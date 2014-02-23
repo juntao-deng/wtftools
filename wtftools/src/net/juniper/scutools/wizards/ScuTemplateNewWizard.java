@@ -18,14 +18,14 @@ import org.eclipse.ui.IWorkbenchWizard;
  * be able to open it.
  */
 
-public class WtfTemplateNewWizard extends Wizard implements INewWizard {
-	private WtfNewApplicationPage page1;
+public class ScuTemplateNewWizard extends Wizard implements INewWizard {
+	private ScuNewApplicationPage page1;
 	private ISelection selection;
 
 	/**
 	 * Constructor for WtfProjectNewWizard.
 	 */
-	public WtfTemplateNewWizard() {
+	public ScuTemplateNewWizard() {
 		super();
 		setNeedsProgressMonitor(true);
 	}
@@ -35,7 +35,7 @@ public class WtfTemplateNewWizard extends Wizard implements INewWizard {
 	 */
 
 	public void addPages() {
-		page1 = new WtfNewApplicationPage(selection);
+		page1 = new ScuNewApplicationPage(selection);
 		addPage(page1);
 	}
 

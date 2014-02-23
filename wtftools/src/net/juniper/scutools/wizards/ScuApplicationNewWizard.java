@@ -21,14 +21,14 @@ import org.eclipse.ui.IWorkbenchWizard;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 
-public class WtfApplicationNewWizard extends Wizard implements INewWizard {
-	private WtfNewApplicationPage page1;
+public class ScuApplicationNewWizard extends Wizard implements INewWizard {
+	private ScuNewApplicationPage page1;
 	private ISelection selection;
 
 	/**
 	 * Constructor for WtfProjectNewWizard.
 	 */
-	public WtfApplicationNewWizard() {
+	public ScuApplicationNewWizard() {
 		super();
 		setNeedsProgressMonitor(true);
 	}
@@ -38,7 +38,7 @@ public class WtfApplicationNewWizard extends Wizard implements INewWizard {
 	 */
 
 	public void addPages() {
-		page1 = new WtfNewApplicationPage(selection);
+		page1 = new ScuNewApplicationPage(selection);
 		addPage(page1);
 	}
 

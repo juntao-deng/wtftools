@@ -31,7 +31,7 @@ import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Group;
 
 @SuppressWarnings("restriction")
-public class WtfNewProjectPage1 extends WizardPage{
+public class ScuNewNodeProjectPage1 extends WizardPage{
 	private NameGroup fNameGroup;
 	private LocationGroup fLocationGroup;
 	private String fInitialName;
@@ -170,9 +170,9 @@ public class WtfNewProjectPage1 extends WizardPage{
 		}
 	}
 
-	public WtfNewProjectPage1(ISelection selection){
-		super("Wtf Project Wizard");
-		setTitle("Create a Wtf Project");
+	public ScuNewNodeProjectPage1(ISelection selection){
+		super("Scu Node Project Wizard");
+		setTitle("Create a Scu Node Project");
 		setDescription("Information about the project to be created"); //
 		fInitialName = "";
 	}

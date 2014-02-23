@@ -18,7 +18,7 @@ import org.eclipse.ui.IWorkbenchWizard;
  *
  */
 public class ScuNodeProjectWizard extends Wizard implements INewWizard {
-	private WtfNewProjectPage1 page1;
+	private ScuNewNodeProjectPage1 page1;
 	private WtfNewProjectPage2 page2;
 	private ISelection selection;
 	private ScuNodeProjectProvider projectProvider;
@@ -36,7 +36,7 @@ public class ScuNodeProjectWizard extends Wizard implements INewWizard {
 	 */
 	@Override
 	public void addPages() {
-		page1 = new WtfNewProjectPage1(selection);
+		page1 = new ScuNewNodeProjectPage1(selection);
 		addPage(page1);
 		
 		page2 = new WtfNewProjectPage2(selection);

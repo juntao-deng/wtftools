@@ -41,7 +41,7 @@ public class ClasspathComputer{
 		ArrayList<IClasspathEntry> result = new ArrayList<IClasspathEntry>();
 		addSourceAndLibraries(javaproject, clear, result);
 		result.add(ProjCoreUtility.createJREEntry());
-		for (WtfProjectClassPathContainerID id : WtfProjectClassPathContainerID.values()){
+		for (ScuProjectClassPathContainerID id : ScuProjectClassPathContainerID.values()){
 			result.add(ProjCoreUtility.createContainerClasspathEntry(id));
 		}
 		try{

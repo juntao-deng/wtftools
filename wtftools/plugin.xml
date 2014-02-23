@@ -23,7 +23,7 @@
          </run>
       </runtime>
       <builder
-            id="net.juniper.wtftools.builder.WtfProjectBuilder">
+            id="net.juniper.scutools.builder.ScuNodeProjectBuilder">
       </builder>
    </extension>
    <extension
@@ -111,11 +111,11 @@
    <extension
          point="org.eclipse.ui.newWizards">
       <category
-            name="Wtf Project Wizards"
-            id="WtfTools">
+            name="SCU Project Wizards"
+            id="ScuWizardTools">
       </category>
       <wizard
-            category="WtfTools"
+            category="ScuWizardTools"
             class="net.juniper.scutools.wizards.ScuNodeProjectWizard"
             finalPerspective="org.eclipse.wst.jsdt.ui.JavaPerspective"
             icon="icons/sample.gif"
@@ -124,48 +124,29 @@
             project="true">
       </wizard>
       <wizard
-            category="WtfTools"
-            class="net.juniper.scutools.wizards.WtfProjectNewWizard"
+            category="ScuWizardTools"
+            class="net.juniper.scutools.wizards.ScuApplicationNewWizard"
             icon="icons/sample.gif"
-            id="net.juniper.wtftools.wizards.WtfProjectNewWizard"
-            name="Wtf Project Wizard"
-            project="true">
+            id="net.juniper.scutools.wizards.ScuApplicationNewWizard"
+            name="SCU Application Wizard"
+            project="false">
       </wizard>
       <wizard
-            category="WtfTools"
-            class="net.juniper.scutools.wizards.WtfApplicationNewWizard"
+            category="ScuWizardTools"
+            class="net.juniper.scutools.wizards.ScuTemplateNewWizard"
             icon="icons/sample.gif"
-            id="net.juniper.wtftools.wizards.WtfApplicationNewWizard"
-            name="Wtf Application Wizard"
-            project="true">
-      </wizard>
-      <wizard
-            category="WtfTools"
-            class="net.juniper.scutools.wizards.WtfTemplateNewWizard"
-            icon="icons/sample.gif"
-            id="net.juniper.wtftools.wizards.WtfTemplateNewWizard"
-            name="Wtf Template Wizard"
+            id="net.juniper.scutools.wizards.ScuTemplateNewWizard"
+            name="SCU Template Wizard"
             project="false">
       </wizard>
    </extension>
    <extension
          point="org.eclipse.ui.views">
-      <category
-            name="Wtf Category"
-            id="WtfTools">
-      </category>
-      <view
-            name="Wtf View"
-            icon="icons/sample.gif"
-            category="WtfTools"
-            class="net.juniper.scutools.views.WtfProjectView"
-            id="net.juniper.wtftools.views.WtfProjectView">
-      </view>
    </extension>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension
-            targetID="org.eclipse.jdt.ui.JavaPerspective">
+            targetID="org.eclipse.wst.jsdt.ui.JavaPerspective">
          <view
                ratio="0.5"
                relative="org.eclipse.ui.views.ProblemView"
@@ -183,7 +164,7 @@
    <extension
          point="org.eclipse.jdt.core.classpathContainerInitializer">
       <classpathContainerInitializer
-            class="net.juniper.scutools.project.WtfClasspathInitializer"
+            class="net.juniper.scutools.project.ScuClasspathInitializer"
             id="net.juniper.wtf.library.container">
       </classpathContainerInitializer>
    </extension>
@@ -192,25 +173,20 @@
       <objectContribution
             adaptable="true"
             objectClass="org.eclipse.core.resources.IResource"
-            id="net.juniper.wst-toolset">
+            id="net.juniper.scu-toolset">
          <menu
-               label="Wtf Tools"
-               id="net.juniper.wst-tool">
+               label="SCU Tools"
+               id="net.juniper.scu-tool">
             <separator name="group0"/>
          </menu>
          <filter
-               value="net.juniper.wtftools.builder.WtfProjectNature"
+               value="net.juniper.scutools.builder.ScuNodeProjectNature"
                name="projectNature"/>
          <action
-               class="net.juniper.scutools.project.UpdateWtfClasspathAction"
-               id="net.juniper.wtftools.project.UpdateWtfClasspathAction"
-               label="Update Wtf ClassPath"
-               menubarPath="net.juniper.wst-tool/group0"/>
-         <action
-               class="net.juniper.scutools.project.AddWtfProjectNature"
-               id="net.juniper.wtftools.project.AddWtfProjectNature"
-               label="Add Wtf Project Nature"
-               menubarPath="net.juniper.wst-tool/group0">
+               class="net.juniper.scutools.project.SyncScuCodesAction"
+               id="net.juniper.scutools.project.SyncScuCodesAction"
+               label="Sync All SCU Codes"
+               menubarPath="net.juniper.scu-tool/group0">
          </action>
        	</objectContribution>
     </extension>
@@ -220,7 +196,7 @@
             class="net.juniper.scutools.editor.BrowserDesignEditor"
             default="false"
             filenames="*.html"
-            id="net.juniper.wtftools.editor.BrowserDesignEditor"
+            id="net.juniper.scutools.editor.BrowserDesignEditor"
             name="Design Editor">
          <contentTypeBinding
                contentTypeId="org.eclipse.wst.html.core.htmlsource">
@@ -254,8 +230,8 @@
             class="net.juniper.scutools.launch.ScuV8LaunchShortcut"
             icon="icons/start_server.gif"
             id="net.juniper.scutools.launch.ScuV8LaunchShortcut"
-            label="Start SCU Server"
-            modes="run, debug">
+            label="Start SCU Debugger"
+            modes="debug">
          <contextualLaunch>
             <enablement>
                <with

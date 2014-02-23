@@ -5,7 +5,7 @@ import net.juniper.scutools.common.ScuToolsConstants;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
-public enum WtfProjectClassPathContainerID {
+public enum ScuProjectClassPathContainerID {
 //	Middleware_Library,
 //	Product_Common,
 //	WTF_BASIC_Library;

@@ -11,13 +11,13 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 
 
-public class WtfClasspathInitializer extends ClasspathContainerInitializer{
+public class ScuClasspathInitializer extends ClasspathContainerInitializer{
 	public void initialize(IPath containerPath, IJavaProject javaProject) throws CoreException{
 		if (javaProject != null){
 			String libname = containerPath.segment(1);
-			WtfProjectClassPathContainerID id = null;
+			ScuProjectClassPathContainerID id = null;
 			try{
-				id = WtfProjectClassPathContainerID.valueOf(libname);
+				id = ScuProjectClassPathContainerID.valueOf(libname);
 				ClasspathContainer container = new ClasspathContainer(id, ProjCoreUtility.getClasspathEntry(javaProject.getProject(), id));
 				JavaCore.setClasspathContainer(container.getPath(), new IJavaProject[] { javaProject }, new IClasspathContainer[] { container }, null);
 			}

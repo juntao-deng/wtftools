@@ -46,7 +46,7 @@ public class ProjCoreUtility {
 		proj.setDescription(description, monitor);
 	}
 
-	public static IClasspathEntry[] getClasspathEntry(IProject project, WtfProjectClassPathContainerID id) throws CoreException{
+	public static IClasspathEntry[] getClasspathEntry(IProject project, ScuProjectClassPathContainerID id) throws CoreException{
 		switch (id){
 //			case WTF_BASIC_Library:
 //				try{
@@ -199,7 +199,7 @@ public class ProjCoreUtility {
 		}
 	}
 
-	public static IClasspathEntry createContainerClasspathEntry(WtfProjectClassPathContainerID id){
+	public static IClasspathEntry createContainerClasspathEntry(ScuProjectClassPathContainerID id){
 		return JavaCore.newContainerEntry(new Path(ScuToolsConstants.SCU_LIBRARY_CONTAINER_ID).append(id.name()), false);
 	}
 }

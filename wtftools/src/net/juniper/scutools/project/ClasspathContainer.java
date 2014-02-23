@@ -5,9 +5,9 @@ import org.eclipse.jdt.core.IClasspathEntry;
 
 public class ClasspathContainer implements IClasspathContainer{
 	protected IClasspathEntry[]	entries;
-	private WtfProjectClassPathContainerID	id;
+	private ScuProjectClassPathContainerID	id;
 
-	public ClasspathContainer(WtfProjectClassPathContainerID id, IClasspathEntry[] entries){
+	public ClasspathContainer(ScuProjectClassPathContainerID id, IClasspathEntry[] entries){
 		this.id = id;
 		this.entries = entries;
 	}

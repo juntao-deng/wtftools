@@ -16,8 +16,8 @@ import org.eclipse.ui.IWorkbenchWizard;
  * @author juntaod
  *
  */
-public class WtfProjectNewWizard extends Wizard implements INewWizard {
-	private WtfNewProjectPage1 page1;
+public class ScuJeeProjectNewWizard extends Wizard implements INewWizard {
+	private ScuNewNodeProjectPage1 page1;
 	private WtfNewProjectPage2 page2;
 	private ISelection selection;
 	private ScuJeeProjectProvider projectProvider;
@@ -25,7 +25,7 @@ public class WtfProjectNewWizard extends Wizard implements INewWizard {
 	/**
 	 * Constructor for WtfProjectNewWizard.
 	 */
-	public WtfProjectNewWizard() {
+	public ScuJeeProjectNewWizard() {
 		super();
 		setNeedsProgressMonitor(true);
 	}
@@ -35,7 +35,7 @@ public class WtfProjectNewWizard extends Wizard implements INewWizard {
 	 */
 	@Override
 	public void addPages() {
-		page1 = new WtfNewProjectPage1(selection);
+		page1 = new ScuNewNodeProjectPage1(selection);
 		addPage(page1);
 		
 		page2 = new WtfNewProjectPage2(selection);
